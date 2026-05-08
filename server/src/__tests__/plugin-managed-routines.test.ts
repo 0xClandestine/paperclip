@@ -55,7 +55,7 @@ function manifest(): PaperclipPluginManifestV1 {
     agents: [{
       agentKey: "wiki-maintainer",
       displayName: "Wiki Maintainer",
-      role: "engineer",
+      role: "general",
       adapterType: "process",
       adapterConfig: { command: "pnpm wiki:maintain" },
     }],
@@ -188,7 +188,7 @@ describeEmbeddedPostgres("plugin-managed routines", () => {
     const [agent] = await db.insert(agents).values({
       companyId,
       name: "Operator-selected maintainer",
-      role: "engineer",
+      role: "general",
       status: "idle",
       adapterType: "process",
       adapterConfig: {},

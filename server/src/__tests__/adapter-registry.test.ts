@@ -287,7 +287,7 @@ describe("server adapter registry", () => {
         id: "agent-123",
         companyId: "company-123",
         name: "Hermes Agent",
-        role: "engineer",
+        role: "general",
         adapterType: "hermes_local",
         adapterConfig: {
           env: {
@@ -332,7 +332,7 @@ describe("server adapter registry", () => {
         id: "agent-123",
         companyId: "company-123",
         name: "Hermes Agent",
-        role: "engineer",
+        role: "general",
         adapterType: "hermes_local",
         adapterConfig: {
           command: "agent-hermes",
@@ -364,7 +364,7 @@ describe("server adapter registry", () => {
         id: "agent-123",
         companyId: "company-123",
         name: "Hermes Agent",
-        role: "engineer",
+        role: "general",
         adapterType: "hermes_local",
         adapterConfig: {
           env: {
@@ -396,7 +396,7 @@ describe("server adapter registry", () => {
         id: "agent-123",
         companyId: "company-123",
         name: "Hermes Agent",
-        role: "engineer",
+        role: "general",
         adapterType: "hermes_local",
         adapterConfig: {
           env: {
@@ -432,7 +432,7 @@ describe("server adapter registry", () => {
         id: "agent-123",
         companyId: "company-123",
         name: "Hermes Agent",
-        role: "engineer",
+        role: "general",
         adapterType: "hermes_local",
         adapterConfig: {},
       },

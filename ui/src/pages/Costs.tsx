@@ -523,7 +523,7 @@ export function Costs() {
   const budgetPolicies = budgetData?.policies ?? [];
   const activeBudgetIncidents = budgetData?.activeIncidents ?? [];
   const budgetPoliciesByScope = useMemo(() => ({
-    company: budgetPolicies.filter((policy) => policy.scopeType === "company"),
+    project: budgetPolicies.filter((policy) => policy.scopeType === "project"),
     agent: budgetPolicies.filter((policy) => policy.scopeType === "agent"),
     project: budgetPolicies.filter((policy) => policy.scopeType === "project"),
   }), [budgetPolicies]);
@@ -909,7 +909,7 @@ export function Costs() {
                       <div>
                         <h2 className="text-lg font-semibold capitalize">{scopeType} budgets</h2>
                         <p className="text-sm text-muted-foreground">
-                          {scopeType === "company"
+                          {scopeType === "project"
                             ? "Company-wide monthly policy."
                             : scopeType === "agent"
                               ? "Recurring monthly spend policies for individual agents."

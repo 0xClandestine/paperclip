@@ -90,8 +90,8 @@ export function CompanyAccess() {
   });
 
   const joinRequestsQuery = useQuery({
-    queryKey: queryKeys.access.joinRequests(selectedCompanyId ?? "", "pending_approval"),
-    queryFn: () => accessApi.listJoinRequests(selectedCompanyId!, "pending_approval"),
+    queryKey: queryKeys.access.joinRequests(selectedCompanyId ?? "", "idle"),
+    queryFn: () => accessApi.listJoinRequests(selectedCompanyId!, "idle"),
     enabled: !!selectedCompanyId && !!membersQuery.data?.access.canApproveJoinRequests,
   });
 
@@ -99,7 +99,7 @@ export function CompanyAccess() {
     if (!selectedCompanyId) return;
     await queryClient.invalidateQueries({ queryKey: queryKeys.access.companyMembers(selectedCompanyId) });
     await queryClient.invalidateQueries({ queryKey: queryKeys.access.companyUserDirectory(selectedCompanyId) });
-    await queryClient.invalidateQueries({ queryKey: queryKeys.access.joinRequests(selectedCompanyId, "pending_approval") });
+    await queryClient.invalidateQueries({ queryKey: queryKeys.access.joinRequests(selectedCompanyId, "idle") });
   };
 
   const updateMemberMutation = useMutation({
@@ -622,7 +622,7 @@ function memberDisplayName(member: CompanyMember | null) {
 }
 
 function isAssignableAgent(agent: Agent) {
-  return agent.status !== "terminated" && agent.status !== "pending_approval";
+  return agent.status !== "terminated" && agent.status !== "idle";
 }
 
 function isEditableMemberStatus(status: CompanyMember["status"]): status is EditableMemberStatus {

@@ -153,7 +153,7 @@ describe.sequential("POST /companies/:companyId/openclaw/invite-prompt", () => {
     mockAgentService.getById.mockResolvedValue({
       id: "agent-1",
       companyId: "company-1",
-      role: "engineer",
+      role: "general",
     });
     const app = createApp(
       {
@@ -178,7 +178,7 @@ describe.sequential("POST /companies/:companyId/openclaw/invite-prompt", () => {
     mockAgentService.getById.mockResolvedValue({
       id: "agent-1",
       companyId: "company-1",
-      role: "ceo",
+      role: "explorer",
     });
     const app = createApp(
       {

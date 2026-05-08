@@ -145,7 +145,7 @@ describe("SystemNotice", () => {
               {
                 kind: "agent",
                 label: "Owner",
-                name: "CTO",
+                name: "Optimizer",
                 href: "/PAP/agents/cto",
               },
               {

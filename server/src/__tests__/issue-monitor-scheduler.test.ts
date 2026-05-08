@@ -166,7 +166,7 @@ describeEmbeddedPostgres("issue monitor scheduler", () => {
       id: agentId,
       companyId,
       name: "Monitor Bot",
-      role: "engineer",
+      role: "general",
       status: input?.agentStatus ?? "active",
       adapterType: "process",
       adapterConfig: {

@@ -74,7 +74,7 @@ function makeApproval(status: Approval["status"]): Approval {
   return {
     id: `approval-${status}`,
     companyId: "company-1",
-    type: "hire_agent",
+    type: "request_board_approval",
     requestedByAgentId: null,
     requestedByUserId: null,
     status,
@@ -106,7 +106,7 @@ function makeJoinRequest(id: string): JoinRequest {
     inviteId: "invite-1",
     companyId: "company-1",
     requestType: "human",
-    status: "pending_approval",
+    status: "idle",
     requestEmailSnapshot: null,
     requestIp: "127.0.0.1",
     requestingUserId: null,

@@ -145,7 +145,7 @@ describe.sequential("company portability routes", () => {
     mockAgentService.getById.mockImplementation(async (id: string) => ({
       id,
       companyId,
-      role: id === ceoAgentId ? "ceo" : "engineer",
+      role: id === ceoAgentId ? "explorer" : "general",
     }));
     mockCompanyPortabilityService.exportBundle.mockResolvedValue(createExportResult());
     mockCompanyPortabilityService.previewExport.mockResolvedValue({

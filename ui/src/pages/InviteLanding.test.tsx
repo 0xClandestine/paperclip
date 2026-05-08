@@ -366,7 +366,7 @@ describe("InviteLandingPage", () => {
       id: "join-1",
       companyId: "company-1",
       requestType: "human",
-      status: "pending_approval",
+      status: "idle",
     });
     getSessionMock.mockResolvedValue({
       session: { id: "session-1", userId: "user-1" },
@@ -434,7 +434,7 @@ describe("InviteLandingPage", () => {
       humanRole: "operator",
       expiresAt: "2027-03-07T00:10:00.000Z",
       inviteMessage: "Welcome aboard.",
-      joinRequestStatus: "pending_approval",
+      joinRequestStatus: "idle",
       joinRequestType: "human",
     });
     getSessionMock.mockResolvedValue({
@@ -600,7 +600,7 @@ describe("InviteLandingPage", () => {
       id: "join-1",
       companyId: "company-1",
       requestType: "human",
-      status: "pending_approval",
+      status: "idle",
     });
     listCompaniesMock.mockImplementation(
       () =>

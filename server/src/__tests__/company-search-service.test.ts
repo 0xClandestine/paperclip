@@ -252,7 +252,7 @@ describeEmbeddedPostgres("companySearchService", () => {
     });
     await createAgent(companyId, {
       name: "Plain Agent",
-      role: "engineer",
+      role: "general",
       capabilities: "Plain agent capabilities",
     });
     await createProject(companyId, {
@@ -338,11 +338,11 @@ describeEmbeddedPostgres("companySearchService", () => {
     ]);
     const agentMatchId = await createAgent(companyId, {
       name: "100% Specialist",
-      role: "engineer",
+      role: "general",
     });
     const agentDecoyId = await createAgent(companyId, {
       name: "1000 Specialist",
-      role: "engineer",
+      role: "general",
     });
     const projectMatchId = await createProject(companyId, {
       name: "100% Launch Plan",

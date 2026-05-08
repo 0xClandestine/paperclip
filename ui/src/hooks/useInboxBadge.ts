@@ -156,7 +156,7 @@ export function useInboxBadge(companyId: string | null | undefined) {
     queryKey: queryKeys.access.joinRequests(companyId!),
     queryFn: async () => {
       try {
-        return await accessApi.listJoinRequests(companyId!, "pending_approval");
+        return await accessApi.listJoinRequests(companyId!, "idle");
       } catch (err) {
         if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
           return [];

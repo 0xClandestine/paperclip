@@ -451,7 +451,7 @@ export function InviteLandingPage() {
     return <div className="mx-auto max-w-xl py-10 text-sm text-muted-foreground">Opening company...</div>;
   }
 
-  if (inviteJoinRequestStatus === "pending_approval") {
+  if (inviteJoinRequestStatus === "idle") {
     return (
       <AwaitingJoinApprovalPanel
         companyDisplayName={companyDisplayName}

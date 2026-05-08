@@ -77,7 +77,7 @@ describeEmbeddedPostgres("cleanup removal services", () => {
       id: agentId,
       companyId,
       name: "CodexCoder",
-      role: "engineer",
+      role: "general",
       status: "active",
       adapterType: "codex_local",
       adapterConfig: {},

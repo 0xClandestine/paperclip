@@ -137,7 +137,7 @@ describeEmbeddedPostgres("GET /companies/:companyId/invites", () => {
       inviteId: inviteThreeId,
       companyId,
       requestType: "human",
-      status: "pending_approval",
+      status: "idle",
       requestIp: "127.0.0.1",
       requestEmailSnapshot: "person@example.com",
       createdAt: new Date("2026-04-12T00:05:00.000Z"),

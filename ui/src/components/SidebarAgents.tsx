@@ -63,7 +63,7 @@ function SidebarAgentItem({
   const isPaused = agent.status === "paused";
   const isBudgetPaused = isPaused && agent.pauseReason === "budget";
   const pauseResumeLabel = isPaused ? "Resume agent" : "Pause agent";
-  const pauseResumeDisabled = disabled || agent.status === "pending_approval" || isBudgetPaused;
+  const pauseResumeDisabled = disabled || agent.status === "idle" || isBudgetPaused;
   const pauseResumeDisabledLabel = disabled
     ? "Updating..."
     : isBudgetPaused

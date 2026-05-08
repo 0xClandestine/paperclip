@@ -162,8 +162,8 @@ export const storybookAgents: Agent[] = [
     id: "agent-cto",
     companyId: "company-storybook",
     name: "CTO",
-    urlKey: "cto",
-    role: "cto",
+    urlKey: "optimizer",
+    role: "optimizer",
     title: "CTO",
     icon: "crown",
     status: "active",
@@ -1031,7 +1031,7 @@ export const storybookApprovals: Approval[] = [
   {
     id: "approval-hire-designer",
     companyId: "company-storybook",
-    type: "hire_agent",
+    type: "request_board_approval",
     requestedByAgentId: "agent-cto",
     requestedByUserId: null,
     status: "pending",
@@ -1101,7 +1101,7 @@ export const storybookBudgetSummaries: BudgetPolicySummary[] = [
   {
     policyId: "budget-company-ok",
     companyId: "company-storybook",
-    scopeType: "company",
+    scopeType: "project",
     scopeId: "company-storybook",
     scopeName: "Paperclip Storybook",
     metric: "billed_cents",

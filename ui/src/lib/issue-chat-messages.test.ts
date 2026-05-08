@@ -19,7 +19,7 @@ function createAgent(id: string, name: string): Agent {
     id,
     companyId: "company-1",
     name,
-    role: "engineer",
+    role: "general",
     title: null,
     icon: "code",
     status: "active",

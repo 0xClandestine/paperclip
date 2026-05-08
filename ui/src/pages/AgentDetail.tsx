@@ -911,7 +911,7 @@ export function AgentDetail() {
   if (!urlRunId && !urlTab) {
     return <Navigate to={`/agents/${canonicalAgentRef}/dashboard`} replace />;
   }
-  const isPendingApproval = agent.status === "pending_approval";
+  const isPendingApproval = agent.status === "idle";
   const showConfigActionBar = (activeView === "configuration" || activeView === "instructions") && (configDirty || configSaving);
 
   return (

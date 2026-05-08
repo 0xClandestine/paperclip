@@ -116,7 +116,7 @@ describe("approval routes idempotent retries", () => {
     mockApprovalService.getById.mockResolvedValue({
       id: "approval-1",
       companyId: "company-1",
-      type: "hire_agent",
+      type: "request_board_approval",
       status: "approved",
       payload: {},
       requestedByAgentId: "agent-1",
@@ -125,7 +125,7 @@ describe("approval routes idempotent retries", () => {
       approval: {
         id: "approval-1",
         companyId: "company-1",
-        type: "hire_agent",
+        type: "request_board_approval",
         status: "approved",
         payload: {},
         requestedByAgentId: "agent-1",
@@ -147,7 +147,7 @@ describe("approval routes idempotent retries", () => {
     mockApprovalService.getById.mockResolvedValue({
       id: "approval-1",
       companyId: "company-1",
-      type: "hire_agent",
+      type: "request_board_approval",
       status: "rejected",
       payload: {},
     });
@@ -155,7 +155,7 @@ describe("approval routes idempotent retries", () => {
       approval: {
         id: "approval-1",
         companyId: "company-1",
-        type: "hire_agent",
+        type: "request_board_approval",
         status: "rejected",
         payload: {},
       },
@@ -174,7 +174,7 @@ describe("approval routes idempotent retries", () => {
     mockApprovalService.getById.mockResolvedValue({
       id: "approval-2",
       companyId: "company-2",
-      type: "hire_agent",
+      type: "request_board_approval",
       status: "pending",
       payload: {},
     });
@@ -191,7 +191,7 @@ describe("approval routes idempotent retries", () => {
     mockApprovalService.getById.mockResolvedValue({
       id: "approval-3",
       companyId: "company-2",
-      type: "hire_agent",
+      type: "request_board_approval",
       status: "pending",
       payload: {},
     });
@@ -208,7 +208,7 @@ describe("approval routes idempotent retries", () => {
     mockApprovalService.getById.mockResolvedValue({
       id: "approval-4",
       companyId: "company-1",
-      type: "hire_agent",
+      type: "request_board_approval",
       status: "pending",
       payload: {},
       requestedByAgentId: null,
@@ -217,7 +217,7 @@ describe("approval routes idempotent retries", () => {
       approval: {
         id: "approval-4",
         companyId: "company-1",
-        type: "hire_agent",
+        type: "request_board_approval",
         status: "approved",
         payload: {},
         requestedByAgentId: null,
@@ -237,7 +237,7 @@ describe("approval routes idempotent retries", () => {
     mockApprovalService.getById.mockResolvedValue({
       id: "approval-5",
       companyId: "company-1",
-      type: "hire_agent",
+      type: "request_board_approval",
       status: "pending",
       payload: {},
     });
@@ -245,7 +245,7 @@ describe("approval routes idempotent retries", () => {
       approval: {
         id: "approval-5",
         companyId: "company-1",
-        type: "hire_agent",
+        type: "request_board_approval",
         status: "rejected",
         payload: {},
       },
@@ -264,14 +264,14 @@ describe("approval routes idempotent retries", () => {
     mockApprovalService.getById.mockResolvedValue({
       id: "approval-6",
       companyId: "company-1",
-      type: "hire_agent",
+      type: "request_board_approval",
       status: "pending",
       payload: {},
     });
     mockApprovalService.requestRevision.mockResolvedValue({
       id: "approval-6",
       companyId: "company-1",
-      type: "hire_agent",
+      type: "request_board_approval",
       status: "revision_requested",
       payload: {},
     });

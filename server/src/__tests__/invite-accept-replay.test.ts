@@ -14,7 +14,7 @@ describe("canReplayOpenClawGatewayInviteAccept", () => {
         existingJoinRequest: {
           requestType: "agent",
           adapterType: "openclaw_gateway",
-          status: "pending_approval",
+          status: "idle",
         },
       }),
     ).toBe(true);
@@ -50,7 +50,7 @@ describe("canReplayOpenClawGatewayInviteAccept", () => {
         existingJoinRequest: {
           requestType: "agent",
           adapterType: "openclaw_gateway",
-          status: "pending_approval",
+          status: "idle",
         },
       }),
     ).toBe(false);

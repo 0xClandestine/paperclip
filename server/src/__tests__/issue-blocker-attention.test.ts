@@ -62,7 +62,7 @@ describeEmbeddedPostgres("issue blocker attention", () => {
       id: agentId,
       companyId,
       name: `${prefix} Agent`,
-      role: "engineer",
+      role: "general",
       status: "idle",
     });
     return { companyId, agentId };

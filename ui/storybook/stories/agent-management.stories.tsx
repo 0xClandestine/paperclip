@@ -161,10 +161,10 @@ const agentManagementAgents: Agent[] = [
   agentWith({
     id: "agent-cto",
     name: "CTO",
-    urlKey: "cto",
+    urlKey: "optimizer",
     status: "paused",
     icon: "crown",
-    role: "cto",
+    role: "optimizer",
     title: "CTO",
     reportsTo: null,
     capabilities: "Reviews engineering strategy, architecture risk, and high-impact implementation tradeoffs.",

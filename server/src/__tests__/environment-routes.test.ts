@@ -250,7 +250,7 @@ describe("environment routes", () => {
     mockAgentService.getById.mockResolvedValue({
       id: "agent-1",
       companyId: "company-1",
-      role: "engineer",
+      role: "general",
       permissions: { canCreateAgents: false },
     });
     mockAccessService.hasPermission.mockResolvedValue(false);
@@ -281,7 +281,7 @@ describe("environment routes", () => {
     mockAgentService.getById.mockResolvedValue({
       id: "agent-1",
       companyId: "company-1",
-      role: "cto",
+      role: "optimizer",
       permissions: { canCreateAgents: true },
     });
     mockAccessService.hasPermission.mockResolvedValue(false);
@@ -306,7 +306,7 @@ describe("environment routes", () => {
     mockAgentService.getById.mockResolvedValue({
       id: "agent-1",
       companyId: "company-1",
-      role: "engineer",
+      role: "general",
       permissions: { canCreateAgents: false },
     });
     mockAccessService.hasPermission.mockResolvedValue(false);
@@ -337,7 +337,7 @@ describe("environment routes", () => {
     mockAgentService.getById.mockResolvedValue({
       id: "agent-1",
       companyId: "company-1",
-      role: "cto",
+      role: "optimizer",
       permissions: { canCreateAgents: true },
     });
     mockAccessService.hasPermission.mockResolvedValue(false);
@@ -438,7 +438,7 @@ describe("environment routes", () => {
     mockAgentService.getById.mockResolvedValue({
       id: "agent-1",
       companyId: "company-1",
-      role: "engineer",
+      role: "general",
       permissions: { canCreateAgents: false },
     });
     mockAccessService.hasPermission.mockResolvedValue(true);
@@ -790,7 +790,7 @@ describe("environment routes", () => {
     mockAgentService.getById.mockResolvedValue({
       id: "agent-1",
       companyId: "company-1",
-      role: "engineer",
+      role: "general",
       permissions: { canCreateAgents: false },
     });
     mockAccessService.hasPermission.mockResolvedValue(false);

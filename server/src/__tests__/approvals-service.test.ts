@@ -30,7 +30,7 @@ function createApproval(status: string): ApprovalRecord {
   return {
     id: "approval-1",
     companyId: "company-1",
-    type: "hire_agent",
+    type: "request_board_approval",
     status,
     payload: { agentId: "agent-1" },
     requestedByAgentId: "requester-1",

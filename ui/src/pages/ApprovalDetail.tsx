@@ -306,7 +306,7 @@ export function ApprovalDetail() {
               Mark resubmitted
             </Button>
           )}
-          {approval.status === "rejected" && approval.type === "hire_agent" && linkedAgentId && (
+          {approval.status === "rejected" && approval.type === "request_board_approval" && linkedAgentId && (
             <Button
               size="sm"
               variant="outline"

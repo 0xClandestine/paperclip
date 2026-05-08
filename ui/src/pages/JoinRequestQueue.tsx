@@ -15,7 +15,7 @@ export function JoinRequestQueue() {
   const { setBreadcrumbs } = useBreadcrumbs();
   const { pushToast } = useToast();
   const queryClient = useQueryClient();
-  const [status, setStatus] = useState<"pending_approval" | "approved" | "rejected">("pending_approval");
+  const [status, setStatus] = useState<"idle" | "approved" | "rejected">("idle");
   const [requestType, setRequestType] = useState<"all" | "human" | "agent">("all");
 
   useEffect(() => {
@@ -92,10 +92,10 @@ export function JoinRequestQueue() {
             className="rounded-md border border-border bg-background px-3 py-2"
             value={status}
             onChange={(event) =>
-              setStatus(event.target.value as "pending_approval" | "approved" | "rejected")
+              setStatus(event.target.value as "idle" | "approved" | "rejected")
             }
           >
-            <option value="pending_approval">Pending approval</option>
+            <option value="idle">Pending approval</option>
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
           </select>
@@ -127,7 +127,7 @@ export function JoinRequestQueue() {
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant={request.status === "pending_approval" ? "secondary" : request.status === "approved" ? "outline" : "destructive"}>
+                    <Badge variant={request.status === "idle" ? "secondary" : request.status === "approved" ? "outline" : "destructive"}>
                       {request.status.replace("_", " ")}
                     </Badge>
                     <Badge variant="outline">{request.requestType}</Badge>
@@ -147,7 +147,7 @@ export function JoinRequestQueue() {
                   </div>
                 </div>
 
-                {request.status === "pending_approval" ? (
+                {request.status === "idle" ? (
                   <div className="flex gap-2">
                     <Button
                       variant="outline"

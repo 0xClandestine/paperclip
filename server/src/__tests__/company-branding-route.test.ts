@@ -98,7 +98,7 @@ describe("PATCH /api/companies/:companyId/branding", () => {
     mockAgentService.getById.mockResolvedValue({
       id: "agent-1",
       companyId: "company-1",
-      role: "engineer",
+      role: "general",
     });
     const app = await createApp({
       type: "agent",
@@ -122,7 +122,7 @@ describe("PATCH /api/companies/:companyId/branding", () => {
     mockAgentService.getById.mockResolvedValue({
       id: "agent-1",
       companyId: "company-1",
-      role: "ceo",
+      role: "explorer",
     });
     mockCompanyService.update.mockResolvedValue(company);
     const app = await createApp({

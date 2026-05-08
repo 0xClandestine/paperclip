@@ -9,7 +9,7 @@ function makeAgent(): Agent {
     id: "agent-1",
     companyId: "company-1",
     name: "Agent",
-    role: "engineer",
+    role: "general",
     title: "Engineer",
     icon: null,
     status: "active",

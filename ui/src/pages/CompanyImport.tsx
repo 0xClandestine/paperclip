@@ -340,7 +340,7 @@ function deriveSourcePrefix(
   return null;
 }
 
-/** Generate a prefix-based rename: e.g. "gstack" + "CEO" → "gstack-CEO" */
+/** Generate a prefix-based rename: e.g. "gstack" + "Agent" → "gstack-Agent" */
 function prefixedName(prefix: string | null, originalName: string): string {
   if (!prefix) return originalName;
   return `${prefix}-${originalName}`;
@@ -691,16 +691,16 @@ export function CompanyImport() {
   const [adapterExpandedSlugs, setAdapterExpandedSlugs] = useState<Set<string>>(new Set());
   const [adapterConfigValues, setAdapterConfigValues] = useState<Record<string, CreateConfigValues>>({});
 
-  // Fetch current company agents to find CEO adapter type
+  // Fetch current project agents to determine default adapter type
   const { data: companyAgents } = useQuery({
     queryKey: selectedCompanyId ? queryKeys.agents.list(selectedCompanyId) : ["agents", "none"],
     queryFn: () => agentsApi.list(selectedCompanyId!),
     enabled: Boolean(selectedCompanyId),
   });
-  const ceoAdapterType = useMemo(() => {
+  const defaultAdapterType = useMemo(() => {
     if (!companyAgents) return "claude_local";
-    const ceo = companyAgents.find((a) => a.role === "ceo");
-    return ceo?.adapterType ?? "claude_local";
+    const firstAgent = companyAgents[0];
+    return firstAgent?.adapterType ?? "claude_local";
   }, [companyAgents]);
 
   const localZipHelpText =
@@ -761,10 +761,10 @@ export function CompanyImport() {
       setSkippedSlugs(new Set());
       setConfirmedSlugs(new Set());
 
-      // Initialize adapter overrides — default all agents to the CEO's adapter type
+      // Initialize adapter overrides — default all agents to the first agent's adapter type
       const defaultAdapters: Record<string, string> = {};
       for (const agent of result.manifest.agents) {
-        defaultAdapters[agent.slug] = ceoAdapterType;
+        defaultAdapters[agent.slug] = defaultAdapterType;
       }
       setAdapterOverrides(defaultAdapters);
       setAdapterExpandedSlugs(new Set());

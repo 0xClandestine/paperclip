@@ -124,7 +124,7 @@ const budgetIncidents: BudgetIncident[] = [
     id: "incident-company-escalated",
     companyId: "company-storybook",
     policyId: "budget-company",
-    scopeType: "company",
+    scopeType: "project",
     scopeId: "company-storybook",
     scopeName: "Paperclip Storybook",
     metric: "billed_cents",

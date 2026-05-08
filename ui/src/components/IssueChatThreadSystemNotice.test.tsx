@@ -168,7 +168,7 @@ describe("IssueChatThread system notice routing", () => {
         sections: [
           {
             rows: [
-              { type: "agent_link", label: "Owner", agentId: "agent-cto", name: "CTO" },
+              { type: "agent_link", label: "Owner", agentId: "agent-cto", name: "Optimizer" },
             ],
           },
         ],

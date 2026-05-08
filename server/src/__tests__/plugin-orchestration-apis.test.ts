@@ -91,7 +91,7 @@ describeEmbeddedPostgres("plugin orchestration APIs", () => {
       id: agentId,
       companyId,
       name: "Engineer",
-      role: "engineer",
+      role: "general",
       status: "idle",
       adapterType: "process",
       adapterConfig: { command: "true" },

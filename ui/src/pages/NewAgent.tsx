@@ -94,7 +94,7 @@ export function NewAgent() {
   });
 
   const isFirstAgent = !agents || agents.length === 0;
-  const effectiveRole = isFirstAgent ? "ceo" : role;
+  const effectiveRole = isFirstAgent ? "explorer" : role;
 
   useEffect(() => {
     setBreadcrumbs([
@@ -105,8 +105,8 @@ export function NewAgent() {
 
   useEffect(() => {
     if (isFirstAgent) {
-      if (!name) setName("CEO");
-      if (!title) setTitle("CEO");
+      if (!name) setName("Researcher");
+      if (!title) setTitle("Researcher");
     }
   }, [isFirstAgent]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -307,7 +307,7 @@ export function NewAgent() {
         {/* Footer */}
         <div className="border-t border-border px-4 py-3">
           {isFirstAgent && (
-            <p className="text-xs text-muted-foreground mb-2">This will be the CEO</p>
+            <p className="text-xs text-muted-foreground mb-2">This will be the first researcher agent</p>
           )}
           {formError && (
             <p className="text-xs text-destructive mb-2">{formError}</p>

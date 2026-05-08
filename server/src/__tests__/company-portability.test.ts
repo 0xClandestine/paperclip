@@ -161,7 +161,7 @@ describe("company portability", () => {
         id: "agent-1",
         name: "ClaudeCoder",
         status: "idle",
-        role: "engineer",
+        role: "general",
         title: "Software Engineer",
         icon: "code",
         reportsTo: null,
@@ -208,7 +208,7 @@ describe("company portability", () => {
         id: "agent-2",
         name: "CMO",
         status: "idle",
-        role: "cmo",
+        role: "general",
         title: "Chief Marketing Officer",
         icon: "globe",
         reportsTo: null,
@@ -550,7 +550,7 @@ describe("company portability", () => {
       '    - "zulu"',
     ].join("\n"));
     expect(exported.manifest.sidebar).toEqual({
-      agents: ["claudecoder", "cmo"],
+      agents: ["claudecoder", "general"],
       projects: ["alpha", "zulu"],
     });
   });
@@ -1837,8 +1837,8 @@ describe("company portability", () => {
           ].join("\n"),
           "agents/ceo/AGENTS.md": [
             "---",
-            'name: "CEO"',
-            'role: "ceo"',
+            'name: "Lead Researcher"',
+            'role: "explorer"',
             "---",
             "",
             "# CEO",
@@ -1858,8 +1858,8 @@ describe("company portability", () => {
     expect(preview.manifest.agents).toEqual([
       expect.objectContaining({
         slug: "ceo",
-        name: "CEO",
-        role: "ceo",
+        name: "Lead Researcher",
+        role: "explorer",
       }),
     ]);
   });
@@ -1872,7 +1872,7 @@ describe("company portability", () => {
         id: "agent-1",
         name: "ClaudeCoder",
         status: "idle",
-        role: "engineer",
+        role: "general",
         title: "Software Engineer",
         icon: "code",
         reportsTo: null,
@@ -2958,7 +2958,7 @@ describe("company portability", () => {
 
     // Simulate existing agents so collision detection triggers rename
     agentSvc.list.mockResolvedValue([
-      { id: "existing-1", name: "ClaudeCoder", status: "idle", role: "engineer", adapterType: "claude_local", adapterConfig: {}, runtimeConfig: {}, budgetMonthlyCents: 0, permissions: {}, metadata: null },
+      { id: "existing-1", name: "ClaudeCoder", status: "idle", role: "general", adapterType: "claude_local", adapterConfig: {}, runtimeConfig: {}, budgetMonthlyCents: 0, permissions: {}, metadata: null },
     ]);
 
     const preview = await portability.previewImport({
@@ -2983,7 +2983,7 @@ describe("company portability", () => {
 
     agentSvc.list.mockResolvedValue([
       {
-        id: "agent-a", name: "AgentA", status: "idle", role: "engineer", title: null, icon: null,
+        id: "agent-a", name: "AgentA", status: "idle", role: "general", title: null, icon: null,
         reportsTo: "agent-b", capabilities: null, adapterType: "claude_local",
         adapterConfig: {}, runtimeConfig: {}, budgetMonthlyCents: 0, permissions: {}, metadata: null,
       },
@@ -3032,8 +3032,8 @@ describe("company portability", () => {
     // Re-import into same company with skip collision strategy
     // Both agents exist so both will be skipped; the existing agent should resolve for issue assignment
     agentSvc.list.mockResolvedValue([
-      { id: "agent-1", name: "ClaudeCoder", status: "idle", role: "engineer", adapterType: "claude_local", adapterConfig: {}, runtimeConfig: {}, budgetMonthlyCents: 0, permissions: {}, metadata: null },
-      { id: "agent-2", name: "CMO", status: "idle", role: "cmo", adapterType: "claude_local", adapterConfig: {}, runtimeConfig: {}, budgetMonthlyCents: 0, permissions: {}, metadata: null },
+      { id: "agent-1", name: "ClaudeCoder", status: "idle", role: "general", adapterType: "claude_local", adapterConfig: {}, runtimeConfig: {}, budgetMonthlyCents: 0, permissions: {}, metadata: null },
+      { id: "agent-2", name: "CMO", status: "idle", role: "general", adapterType: "claude_local", adapterConfig: {}, runtimeConfig: {}, budgetMonthlyCents: 0, permissions: {}, metadata: null },
     ]);
     projectSvc.list.mockResolvedValue([]);
     issueSvc.list.mockResolvedValue([]);

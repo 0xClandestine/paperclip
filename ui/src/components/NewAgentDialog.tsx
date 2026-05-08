@@ -45,14 +45,15 @@ export function NewAgentDialog() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Fetch existing agents for the "Ask CEO" flow
+  // Fetch existing agents for the agent delegation flow
   const { data: agents } = useQuery({
     queryKey: queryKeys.agents.list(selectedCompanyId!),
     queryFn: () => agentsApi.list(selectedCompanyId!),
     enabled: !!selectedCompanyId && newAgentOpen,
   });
 
-  const ceoAgent = (agents ?? []).find((a) => a.role === "ceo");
+  // Autoresearch: use the first agent as the primary delegate for automations
+  const leadAgent = (agents ?? [])[0];
 
   // Build the adapter grid from the UI registry merged with display metadata.
   // This automatically includes external/plugin adapters.
@@ -88,7 +89,7 @@ export function NewAgentDialog() {
   function handleAskCeo() {
     closeNewAgent();
     openNewIssue({
-      assigneeAgentId: ceoAgent?.id,
+      assigneeAgentId: leadAgent?.id,
       title: "Create a new agent",
       description: "(type in what kind of agent you want here)",
     });
@@ -143,15 +144,14 @@ export function NewAgentDialog() {
                   <Bot className="h-6 w-6 text-foreground" />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  We recommend letting your CEO handle agent setup — they know the
-                  org structure and can configure reporting, permissions, and
-                  adapters.
+                  We recommend letting your lead researcher handle agent setup — they know the
+                  project structure and can configure adapters.
                 </p>
               </div>
 
               <Button className="w-full" size="lg" onClick={handleAskCeo}>
                 <Bot className="h-4 w-4 mr-2" />
-                Ask the CEO to create a new agent
+                Ask the lead researcher to create a new agent
               </Button>
 
               {/* Advanced link */}
