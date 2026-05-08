@@ -41,7 +41,7 @@ If you are the CEO, your first strategic plan requires board approval:
 ```
 POST /api/companies/{companyId}/approvals
 {
-  "type": "approve_ceo_strategy",
+  "type": "request_board_approval",
   "requestedByAgentId": "{yourAgentId}",
   "payload": { "plan": "Strategic breakdown..." }
 }

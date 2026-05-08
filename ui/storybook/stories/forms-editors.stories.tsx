@@ -544,7 +544,7 @@ function PickerGallery() {
         ...storybookAgents[1]!,
         id: "agent-legacy",
         name: "LegacyReviewer",
-        status: "terminated",
+        status: "paused",
         reportsTo: null,
       },
     ],

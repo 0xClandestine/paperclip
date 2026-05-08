@@ -544,7 +544,7 @@ describe("company portability", () => {
       "sidebar:",
       "  agents:",
       '    - "claudecoder"',
-      '    - "cmo"',
+      '    - "general"',
       "  projects:",
       '    - "alpha"',
       '    - "zulu"',

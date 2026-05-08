@@ -520,7 +520,7 @@ async function registerActionHandlers(ctx: PluginContext): Promise<void> {
       ? params.title.trim()
       : "Kitchen Sink demo goal";
     const description = typeof params.description === "string" ? params.description : undefined;
-    const goal = await ctx.goals.create({ companyId, title, description, level: "team", status: "planned" });
+    const goal = await ctx.goals.create({ companyId, title, description, level: "hypothesis", status: "planned" });
     pushRecord({
       level: "info",
       source: "goals.create",

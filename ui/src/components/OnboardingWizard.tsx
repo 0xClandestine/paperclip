@@ -402,7 +402,7 @@ export function OnboardingWizard() {
           ...(parsedGoal.description
             ? { description: parsedGoal.description }
             : {}),
-          level: "company",
+          level: "research_question",
           status: "active"
         });
         setCreatedCompanyGoalId(goal.id);

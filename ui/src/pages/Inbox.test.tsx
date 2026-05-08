@@ -78,7 +78,7 @@ function createJoinRequest(
     inviteId: "invite-1",
     companyId: "company-1",
     requestType: "human",
-    status: "idle",
+    status: "pending_approval",
     requestIp: "127.0.0.1",
     requestingUserId: "user-1",
     requestEmailSnapshot: "joiner@example.com",

@@ -106,7 +106,7 @@ function makeJoinRequest(id: string): JoinRequest {
     inviteId: "invite-1",
     companyId: "company-1",
     requestType: "human",
-    status: "idle",
+    status: "pending_approval",
     requestEmailSnapshot: null,
     requestIp: "127.0.0.1",
     requestingUserId: null,

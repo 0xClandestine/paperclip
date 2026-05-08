@@ -190,7 +190,7 @@ export function SidebarAgents() {
 
   const visibleAgents = useMemo(() => {
     const filtered = (agents ?? []).filter(
-      (a: Agent) => a.status !== "terminated"
+      (a: Agent) => a.status !== "paused"
     );
     return filtered;
   }, [agents]);

@@ -390,7 +390,7 @@ export function Routines() {
   const assigneeOptions = useMemo<InlineEntityOption[]>(
     () =>
       sortAgentsByRecency(
-        (agents ?? []).filter((agent) => agent.status !== "terminated"),
+        (agents ?? []).filter((agent) => agent.status !== "paused"),
         recentAssigneeIds,
       ).map((agent) => ({
         id: agent.id,

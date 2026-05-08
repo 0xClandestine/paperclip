@@ -30,10 +30,10 @@ export function ReportsToPicker({
   const [open, setOpen] = useState(false);
   const exclude = new Set(excludeAgentIds);
   const rows = agents.filter(
-    (a) => a.status !== "terminated" && !exclude.has(a.id),
+    (a) => a.status !== "paused" && !exclude.has(a.id),
   );
   const current = value ? agents.find((a) => a.id === value) : null;
-  const terminatedManager = current?.status === "terminated";
+  const terminatedManager = current?.status === "paused";
   const unknownManager = Boolean(value && !current);
 
   return (

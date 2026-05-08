@@ -12,7 +12,7 @@ function pickEarliestGoal(goals: Goal[]) {
 }
 
 export function selectDefaultCompanyGoalId(goals: Goal[]): string | null {
-  const companyGoals = goals.filter((goal) => goal.level === "company");
+  const companyGoals = goals.filter((goal) => goal.level === "research_question");
   const rootGoals = companyGoals.filter((goal) => !goal.parentId);
   const activeRootGoals = rootGoals.filter((goal) => goal.status === "active");
 

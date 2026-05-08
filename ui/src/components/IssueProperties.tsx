@@ -462,7 +462,7 @@ export function IssueProperties({
   const recentAssigneeIds = useMemo(() => getRecentAssigneeIds(), [assigneeOpen]);
   const recentAssigneeSelectionIds = useMemo(() => getRecentAssigneeSelectionIds(), [assigneeOpen]);
   const sortedAgents = useMemo(
-    () => sortAgentsByRecency((agents ?? []).filter((a) => a.status !== "terminated"), recentAssigneeIds),
+    () => sortAgentsByRecency((agents ?? []).filter((a) => a.status !== "paused"), recentAssigneeIds),
     [agents, recentAssigneeIds],
   );
   const recentAssigneeValues = useMemo(

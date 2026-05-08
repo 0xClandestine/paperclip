@@ -56,7 +56,7 @@ async function createCompanyViaWizard(
     {
       data: {
         name: "CEO",
-        role: "ceo",
+        role: "explorer",
         title: "CEO",
         adapterType: "claude_local",
       },

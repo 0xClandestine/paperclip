@@ -1659,9 +1659,7 @@ export function agentRoutes(
         };
       })
       .filter((item) =>
-        item.status !== "paused" &&
-        item.status !== "terminated" &&
-        item.status !== "pending_approval",
+        item.status !== "paused"
       )
       .sort((left, right) => {
         if (left.schedulerActive !== right.schedulerActive) {
@@ -2022,8 +2020,7 @@ export function agentRoutes(
       details: {
         name: agent.name,
         role: agent.role,
-        requiresApproval,
-        approvalId: approval?.id ?? null,
+        requiresApproval: false,
         issueIds: sourceIssueIds,
         desiredSkills: desiredSkillAssignment.desiredSkills,
       },
@@ -2039,21 +2036,8 @@ export function agentRoutes(
       actor.actorType === "user" ? actor.actorId : null,
     );
 
-    if (approval) {
-      await logActivity(db, {
-        companyId,
-        actorType: actor.actorType,
-        actorId: actor.actorId,
-        agentId: actor.agentId,
-        runId: actor.runId,
-        action: "approval.created",
-        entityType: "approval",
-        entityId: approval.id,
-        details: { type: approval.type, linkedAgentId: agent.id },
-      });
-    }
-
-    res.status(201).json({ agent, approval });
+    // Autoresearch: no approval needed for agent creation.
+    res.status(201).json({ agent, approval: null });
   });
 
   router.post("/companies/:companyId/agents", validate(createAgentSchema), async (req, res) => {

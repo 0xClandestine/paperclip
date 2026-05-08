@@ -825,7 +825,7 @@ export function CommentThread({
     if (providedMentions) return providedMentions;
     if (!agentMap) return [];
     return Array.from(agentMap.values())
-      .filter((a) => a.status !== "terminated")
+      .filter((a) => a.status !== "paused")
       .map((a) => ({
         id: `agent:${a.id}`,
         name: a.name,

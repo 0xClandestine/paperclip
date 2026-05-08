@@ -400,7 +400,7 @@ export function DesignGuide() {
               "active", "running", "paused", "idle", "archived", "planned",
               "achieved", "completed", "failed", "timed_out", "succeeded", "error",
               "idle", "backlog", "todo", "in_progress", "in_review", "blocked",
-              "done", "terminated", "cancelled", "pending", "revision_requested",
+              "done", "paused", "cancelled", "pending", "revision_requested",
               "approved", "rejected",
             ].map((s) => (
               <StatusBadge key={s} status={s} />

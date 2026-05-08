@@ -622,7 +622,7 @@ function memberDisplayName(member: CompanyMember | null) {
 }
 
 function isAssignableAgent(agent: Agent) {
-  return agent.status !== "terminated" && agent.status !== "idle";
+  return agent.status !== "paused" && agent.status !== "idle";
 }
 
 function isEditableMemberStatus(status: CompanyMember["status"]): status is EditableMemberStatus {

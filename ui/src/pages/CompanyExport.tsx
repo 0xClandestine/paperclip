@@ -611,7 +611,7 @@ export function CompanyExport() {
   const initialFileFromUrl = useRef(filePathFromLocation(location.pathname));
   const currentUserId = session?.user?.id ?? session?.session?.userId ?? null;
   const visibleAgents = useMemo(
-    () => agents.filter((agent: Agent) => agent.status !== "terminated"),
+    () => agents.filter((agent: Agent) => agent.status !== "paused"),
     [agents],
   );
   const visibleProjects = useMemo(

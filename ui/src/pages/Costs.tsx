@@ -525,7 +525,6 @@ export function Costs() {
   const budgetPoliciesByScope = useMemo(() => ({
     project: budgetPolicies.filter((policy) => policy.scopeType === "project"),
     agent: budgetPolicies.filter((policy) => policy.scopeType === "agent"),
-    project: budgetPolicies.filter((policy) => policy.scopeType === "project"),
   }), [budgetPolicies]);
 
   if (!selectedCompanyId) {
@@ -742,7 +741,7 @@ export function Costs() {
                                   <span className="h-3 w-3 shrink-0" />
                                 )}
                                 <Identity name={row.agentName ?? row.agentId} size="sm" />
-                                {row.agentStatus === "terminated" ? <StatusBadge status="terminated" /> : null}
+                                {row.agentStatus === "paused" ? <StatusBadge status="paused" /> : null}
                               </div>
                               <div className="text-right text-sm tabular-nums">
                                 <div className="font-medium">{formatCents(row.costCents)}</div>
@@ -901,7 +900,7 @@ export function Costs() {
               ) : null}
 
               <div className="space-y-5">
-                {(["company", "agent", "project"] as const).map((scopeType) => {
+                {(["project", "agent"] as const).map((scopeType) => {
                   const rows = budgetPoliciesByScope[scopeType];
                   if (rows.length === 0) return null;
                   return (

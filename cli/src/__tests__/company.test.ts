@@ -123,12 +123,12 @@ describe("renderCompanyImportPreview", () => {
       targetCompanyId: "company-123",
       targetCompanyName: "Imported Co",
       collisionStrategy: "rename",
-      selectedAgentSlugs: ["ceo", "cto", "eng-1", "eng-2", "eng-3", "eng-4", "eng-5"],
+      selectedAgentSlugs: ["explorer", "optimizer", "eng-1", "eng-2", "eng-3", "eng-4", "eng-5"],
       plan: {
         companyAction: "update",
         agentPlans: [
-          { slug: "ceo", action: "create", plannedName: "CEO", existingAgentId: null, reason: null },
-          { slug: "cto", action: "update", plannedName: "CTO", existingAgentId: "agent-2", reason: "replace strategy" },
+          { slug: "explorer", action: "create", plannedName: "Explorer", existingAgentId: null, reason: null },
+          { slug: "optimizer", action: "update", plannedName: "Optimizer", existingAgentId: "agent-2", reason: "replace strategy" },
           { slug: "eng-1", action: "skip", plannedName: "Engineer 1", existingAgentId: "agent-3", reason: "skip strategy" },
           { slug: "eng-2", action: "create", plannedName: "Engineer 2", existingAgentId: null, reason: null },
           { slug: "eng-3", action: "create", plannedName: "Engineer 3", existingAgentId: null, reason: null },
@@ -170,16 +170,16 @@ describe("renderCompanyImportPreview", () => {
           feedbackDataSharingTermsVersion: null,
         },
         sidebar: {
-          agents: ["ceo"],
+          agents: ["explorer"],
           projects: ["alpha"],
         },
         agents: [
           {
-            slug: "ceo",
-            name: "CEO",
+            slug: "explorer",
+            name: "Explorer",
             path: "agents/ceo/AGENT.md",
             skills: [],
-            role: "ceo",
+            role: "explorer",
             title: null,
             icon: null,
             capabilities: null,
@@ -233,7 +233,7 @@ describe("renderCompanyImportPreview", () => {
             path: "projects/alpha/issues/kickoff/TASK.md",
             projectSlug: "alpha",
             projectWorkspaceKey: null,
-            assigneeAgentSlug: "ceo",
+            assigneeAgentSlug: "explorer",
             description: null,
             recurring: false,
             routine: null,
@@ -252,7 +252,7 @@ describe("renderCompanyImportPreview", () => {
           {
             key: "OPENAI_API_KEY",
             description: null,
-            agentSlug: "ceo",
+            agentSlug: "explorer",
             projectSlug: null,
             kind: "secret",
             requirement: "required",
@@ -268,7 +268,7 @@ describe("renderCompanyImportPreview", () => {
         {
           key: "OPENAI_API_KEY",
           description: null,
-          agentSlug: "ceo",
+          agentSlug: "explorer",
           projectSlug: null,
           kind: "secret",
           requirement: "required",
@@ -309,8 +309,8 @@ describe("renderCompanyImportResult", () => {
           action: "updated",
         },
         agents: [
-          { slug: "ceo", id: "agent-1", action: "created", name: "CEO", reason: null },
-          { slug: "cto", id: "agent-2", action: "updated", name: "CTO", reason: "replace strategy" },
+          { slug: "explorer", id: "agent-1", action: "created", name: "Explorer", reason: null },
+          { slug: "optimizer", id: "agent-2", action: "updated", name: "Optimizer", reason: "replace strategy" },
           { slug: "ops", id: null, action: "skipped", name: "Ops", reason: "skip strategy" },
         ],
         projects: [
@@ -352,7 +352,7 @@ describe("import selection catalog", () => {
       targetCompanyId: "company-123",
       targetCompanyName: "Imported Co",
       collisionStrategy: "rename",
-      selectedAgentSlugs: ["ceo"],
+      selectedAgentSlugs: ["explorer"],
       plan: {
         companyAction: "create",
         agentPlans: [],
@@ -387,16 +387,16 @@ describe("import selection catalog", () => {
           feedbackDataSharingTermsVersion: null,
         },
         sidebar: {
-          agents: ["ceo"],
+          agents: ["explorer"],
           projects: ["alpha"],
         },
         agents: [
           {
-            slug: "ceo",
-            name: "CEO",
+            slug: "explorer",
+            name: "Explorer",
             path: "agents/ceo/AGENT.md",
             skills: [],
-            role: "ceo",
+            role: "explorer",
             title: null,
             icon: null,
             capabilities: null,
@@ -450,7 +450,7 @@ describe("import selection catalog", () => {
             path: "projects/alpha/issues/kickoff/TASK.md",
             projectSlug: "alpha",
             projectWorkspaceKey: null,
-            assigneeAgentSlug: "ceo",
+            assigneeAgentSlug: "explorer",
             description: null,
             recurring: false,
             routine: null,
@@ -496,7 +496,7 @@ describe("import selection catalog", () => {
     expect(state.company).toBe(true);
     expect(state.projects.has("alpha")).toBe(true);
     expect(state.issues.has("kickoff")).toBe(true);
-    expect(state.agents.has("ceo")).toBe(true);
+    expect(state.agents.has("explorer")).toBe(true);
     expect(state.skills.has("skill-a")).toBe(true);
 
     state.company = false;

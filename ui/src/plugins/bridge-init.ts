@@ -362,7 +362,7 @@ function PluginSdkAssigneePicker({
   );
   const sortedAgents = useMemo(
     () => sortAgentsByRecency(
-      (agents ?? []).filter((agent) => includeTerminatedAgents || agent.status !== "terminated"),
+      (agents ?? []).filter((agent) => includeTerminatedAgents || agent.status !== "paused"),
       recentAssigneeIds,
     ),
     [agents, includeTerminatedAgents, recentAssigneeIds],

@@ -81,8 +81,9 @@ export function companyRoutes(db: Db, storage?: StorageService) {
     if (!actorAgent || actorAgent.companyId !== companyId) {
       throw forbidden("Agent key cannot access another company");
     }
-    if (actorAgent.role !== "ceo") {
-      throw forbidden(`Only CEO agents can manage company ${capability}`);
+    // Autoresearch: portability management is board-only. No CEO role.
+    if (req.actor.type === "agent") {
+      throw forbidden(`Only the board can manage company ${capability}`);
     }
   }
 
@@ -306,33 +307,23 @@ export function companyRoutes(db: Db, storage?: StorageService) {
     }
     let body: Record<string, unknown>;
 
-    if (req.actor.type === "agent") {
-      // Only CEO agents may update company branding fields
-      const agentSvc = agentService(db);
-      const actorAgent = req.actor.agentId ? await agentSvc.getById(req.actor.agentId) : null;
     // Autoresearch: board-only company settings. No CEO role.
     if (req.actor.type === "agent") {
       throw forbidden("Only the board may update company settings");
     }
-      if (actorAgent.companyId !== companyId) {
-        throw forbidden("Agent key cannot access another company");
-      }
-      body = updateCompanyBrandingSchema.parse(req.body);
-    } else {
-      assertBoard(req);
-      body = updateCompanySchema.parse(req.body);
+    assertBoard(req);
+    body = updateCompanySchema.parse(req.body);
 
-      if (body.feedbackDataSharingEnabled === true && !existingCompany.feedbackDataSharingEnabled) {
-        body = {
-          ...body,
-          feedbackDataSharingConsentAt: new Date(),
-          feedbackDataSharingConsentByUserId: req.actor.userId ?? "local-board",
-          feedbackDataSharingTermsVersion:
-            typeof body.feedbackDataSharingTermsVersion === "string" && body.feedbackDataSharingTermsVersion.length > 0
-              ? body.feedbackDataSharingTermsVersion
-              : DEFAULT_FEEDBACK_DATA_SHARING_TERMS_VERSION,
-        };
-      }
+    if (body.feedbackDataSharingEnabled === true && !existingCompany.feedbackDataSharingEnabled) {
+      body = {
+        ...body,
+        feedbackDataSharingConsentAt: new Date(),
+        feedbackDataSharingConsentByUserId: req.actor.userId ?? "local-board",
+        feedbackDataSharingTermsVersion:
+          typeof body.feedbackDataSharingTermsVersion === "string" && body.feedbackDataSharingTermsVersion.length > 0
+            ? body.feedbackDataSharingTermsVersion
+            : DEFAULT_FEEDBACK_DATA_SHARING_TERMS_VERSION,
+      };
     }
 
     const company = await svc.update(companyId, body);

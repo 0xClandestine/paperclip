@@ -27,7 +27,7 @@ const roleLabels = AGENT_ROLE_LABELS as Record<string, string>;
 type FilterTab = "all" | "active" | "paused" | "error";
 
 function matchesFilter(status: string, tab: FilterTab, showTerminated: boolean): boolean {
-  if (status === "terminated") return showTerminated;
+  if (status === "paused") return showTerminated;
   if (tab === "all") return true;
   if (tab === "active") return status === "active" || status === "running" || status === "idle";
   if (tab === "paused") return status === "paused";
