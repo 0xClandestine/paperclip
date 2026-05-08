@@ -56,7 +56,7 @@ export function JoinRequestQueue() {
   });
 
   if (!selectedCompanyId) {
-    return <div className="text-sm text-muted-foreground">Select a company to review join requests.</div>;
+    return <div className="text-sm text-muted-foreground">Select a research project to review join requests.</div>;
   }
 
   if (requestsQuery.isLoading) {

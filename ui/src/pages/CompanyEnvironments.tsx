@@ -397,7 +397,7 @@ export function CompanyEnvironments() {
       Object.keys(sandboxConfigErrors).length === 0);
 
   if (!selectedCompanyId) {
-    return <div className="text-sm text-muted-foreground">Select a company to manage environments.</div>;
+    return <div className="text-sm text-muted-foreground">Select a research project to manage environments.</div>;
   }
 
   if (!environmentsEnabled) {

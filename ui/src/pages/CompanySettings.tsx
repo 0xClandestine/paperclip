@@ -222,7 +222,7 @@ export function CompanySettings() {
   if (!selectedCompany) {
     return (
       <div className="text-sm text-muted-foreground">
-        No company selected. Select a company from the switcher above.
+        No company selected. Select a research project from the switcher above.
       </div>
     );
   }

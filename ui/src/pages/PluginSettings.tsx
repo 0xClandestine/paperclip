@@ -593,7 +593,7 @@ function PluginLocalFoldersSettings({ pluginId, companyId, declarations }: Plugi
   if (!companyId) {
     return (
       <div className="rounded-md border border-border/60 bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
-        Select a company to configure this plugin's local folders.
+        Select a research project to configure this plugin's local folders.
       </div>
     );
   }

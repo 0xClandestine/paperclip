@@ -1825,7 +1825,7 @@ function PromptsTab({
 
   const uploadMarkdownImage = useMutation({
     mutationFn: async ({ file, namespace }: { file: File; namespace: string }) => {
-      if (!selectedCompanyId) throw new Error("Select a company to upload images");
+      if (!selectedCompanyId) throw new Error("Select a research project to upload images");
       return assetsApi.uploadImage(selectedCompanyId, file, namespace);
     },
   });

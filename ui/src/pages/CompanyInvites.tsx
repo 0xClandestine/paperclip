@@ -151,7 +151,7 @@ export function CompanyInvites() {
   });
 
   if (!selectedCompanyId) {
-    return <div className="text-sm text-muted-foreground">Select a company to manage invites.</div>;
+    return <div className="text-sm text-muted-foreground">Select a research project to manage invites.</div>;
   }
 
   if (invitesQuery.isLoading) {

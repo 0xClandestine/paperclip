@@ -232,7 +232,7 @@ export function CompanyAccess() {
   }, [removingMember]);
 
   if (!selectedCompanyId) {
-    return <div className="text-sm text-muted-foreground">Select a company to manage access.</div>;
+    return <div className="text-sm text-muted-foreground">Select a research project to manage access.</div>;
   }
 
   if (membersQuery.isLoading) {
