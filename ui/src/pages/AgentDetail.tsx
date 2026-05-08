@@ -1605,15 +1605,14 @@ function ConfigurationTab({
   }, [onSavingChange, isConfigSaving]);
 
   const canCreateAgents = Boolean(agent.permissions?.canCreateAgents);
+  // Autoresearch: all agents can assign tasks. No CEO role gate.
   const canAssignTasks = Boolean(agent.access?.canAssignTasks);
   const taskAssignSource = agent.access?.taskAssignSource ?? "none";
-  const taskAssignLocked = agent.role === "ceo" || canCreateAgents;
+  const taskAssignLocked = canCreateAgents;
   const taskAssignHint =
-    taskAssignSource === "ceo_role"
-      ? "Enabled automatically for CEO agents."
-      : taskAssignSource === "agent_creator"
-        ? "Enabled automatically while this agent can create new agents."
-        : taskAssignSource === "explicit_grant"
+    taskAssignSource === "agent_creator"
+      ? "Enabled automatically while this agent can create new agents."
+      : taskAssignSource === "explicit_grant"
           ? "Enabled via explicit company permission grant."
           : "Disabled unless explicitly granted.";
 

@@ -16,14 +16,14 @@ export type BindMode = (typeof BIND_MODES)[number];
 export const AUTH_BASE_URL_MODES = ["auto", "explicit"] as const;
 export type AuthBaseUrlMode = (typeof AUTH_BASE_URL_MODES)[number];
 
+// No pending_approval — agents are created directly (no hire approval flow).
+// No terminated — agents are paused or archived, never "fired."
 export const AGENT_STATUSES = [
   "active",
   "paused",
   "idle",
   "running",
   "error",
-  "pending_approval",
-  "terminated",
 ] as const;
 export type AgentStatus = (typeof AGENT_STATUSES)[number];
 
@@ -41,34 +41,20 @@ export const AGENT_ADAPTER_TYPES = [
 ] as const;
 export type AgentAdapterType = (typeof AGENT_ADAPTER_TYPES)[number] | (string & {});
 
+// Autoresearch agent roles — no corporate hierarchy.
+// Agents are peer researcher tools, not employees.
 export const AGENT_ROLES = [
-  "ceo",
-  "cto",
-  "cmo",
-  "cfo",
-  "security",
-  "engineer",
-  "designer",
-  "pm",
-  "qa",
-  "devops",
-  "researcher",
+  "explorer",
+  "optimizer",
+  "reviewer",
   "general",
 ] as const;
 export type AgentRole = (typeof AGENT_ROLES)[number];
 
 export const AGENT_ROLE_LABELS: Record<AgentRole, string> = {
-  ceo: "CEO",
-  cto: "CTO",
-  cmo: "CMO",
-  cfo: "CFO",
-  security: "Security",
-  engineer: "Engineer",
-  designer: "Designer",
-  pm: "PM",
-  qa: "QA",
-  devops: "DevOps",
-  researcher: "Researcher",
+  explorer: "Explorer",
+  optimizer: "Optimizer",
+  reviewer: "Reviewer",
   general: "General",
 };
 
@@ -288,7 +274,8 @@ export type IssueExecutionMonitorClearReason = (typeof ISSUE_EXECUTION_MONITOR_C
 export const ISSUE_EXECUTION_DECISION_OUTCOMES = ["approved", "changes_requested"] as const;
 export type IssueExecutionDecisionOutcome = (typeof ISSUE_EXECUTION_DECISION_OUTCOMES)[number];
 
-export const GOAL_LEVELS = ["company", "team", "agent", "task"] as const;
+// Research goal hierarchy: question → hypothesis → experiment
+export const GOAL_LEVELS = ["research_question", "hypothesis", "experiment"] as const;
 export type GoalLevel = (typeof GOAL_LEVELS)[number];
 
 export const GOAL_STATUSES = ["planned", "active", "achieved", "cancelled"] as const;
@@ -370,9 +357,9 @@ export const PROJECT_COLORS = [
   "#3b82f6", // blue
 ] as const;
 
+// Autoresearch: no hiring, no CEO strategy gate.
+// Only budget overrides and board-requested approvals remain.
 export const APPROVAL_TYPES = [
-  "hire_agent",
-  "approve_ceo_strategy",
   "budget_override_required",
   "request_board_approval",
 ] as const;
@@ -444,7 +431,9 @@ export const FINANCE_UNITS = [
 ] as const;
 export type FinanceUnit = (typeof FINANCE_UNITS)[number];
 
-export const BUDGET_SCOPE_TYPES = ["company", "agent", "project"] as const;
+// Budget scoped to research project or individual agent.
+// Former "company" scope renamed to "project".
+export const BUDGET_SCOPE_TYPES = ["project", "agent"] as const;
 export type BudgetScopeType = (typeof BUDGET_SCOPE_TYPES)[number];
 
 export const BUDGET_METRICS = ["billed_cents"] as const;

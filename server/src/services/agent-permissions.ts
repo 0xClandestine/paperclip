@@ -2,9 +2,11 @@ export type NormalizedAgentPermissions = Record<string, unknown> & {
   canCreateAgents: boolean;
 };
 
-export function defaultPermissionsForRole(role: string): NormalizedAgentPermissions {
+// Autoresearch: no special role gets elevated permissions by default.
+// All agents are peers. Board creates agents directly.
+export function defaultPermissionsForRole(_role: string): NormalizedAgentPermissions {
   return {
-    canCreateAgents: role === "ceo",
+    canCreateAgents: false,
   };
 }
 

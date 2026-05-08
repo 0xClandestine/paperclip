@@ -8978,7 +8978,7 @@ export function heartbeatService(db: Db, options: HeartbeatServiceOptions = {}) 
     const now = new Date();
     let wakeupIds: string[] = [];
 
-    if (scope.scopeType === "company") {
+    if (scope.scopeType === "project") {
       wakeupIds = await db
         .select({ id: agentWakeupRequests.id })
         .from(agentWakeupRequests)
@@ -9130,7 +9130,7 @@ export function heartbeatService(db: Db, options: HeartbeatServiceOptions = {}) 
     }
 
     const runIds =
-      scope.scopeType === "company"
+      scope.scopeType === "project"
         ? await db
           .select({ id: heartbeatRuns.id })
           .from(heartbeatRuns)

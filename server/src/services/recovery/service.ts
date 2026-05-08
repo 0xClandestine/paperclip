@@ -774,11 +774,12 @@ export function recoveryService(db: Db, deps: { enqueueWakeup: RecoveryWakeup })
       if (sourceAssignee?.reportsTo) candidateIds.push(sourceAssignee.reportsTo);
     }
     if (input.runningAgent.reportsTo) candidateIds.push(input.runningAgent.reportsTo);
+    // Autoresearch: escalate to all active agents in the project (no CTO/CEO roles).
     const roleCandidates = await db
       .select()
       .from(agents)
-      .where(and(eq(agents.companyId, input.run.companyId), inArray(agents.role, ["cto", "ceo"])))
-      .orderBy(sql`case when ${agents.role} = 'cto' then 0 else 1 end`, asc(agents.createdAt));
+      .where(and(eq(agents.companyId, input.run.companyId), eq(agents.status, "active")))
+      .orderBy(asc(agents.createdAt));
     candidateIds.push(...roleCandidates.map((agent) => agent.id));
 
     const seen = new Set<string>();
@@ -1325,11 +1326,12 @@ export function recoveryService(db: Db, deps: { enqueueWakeup: RecoveryWakeup })
       candidateIds.push(issue.createdByAgentId);
     }
 
+    // Autoresearch: escalate to all active agents (no CTO/CEO roles).
     const roleCandidates = await db
       .select()
       .from(agents)
-      .where(and(eq(agents.companyId, issue.companyId), inArray(agents.role, ["cto", "ceo"])))
-      .orderBy(sql`case when ${agents.role} = 'cto' then 0 else 1 end`, asc(agents.createdAt));
+      .where(and(eq(agents.companyId, issue.companyId), eq(agents.status, "active")))
+      .orderBy(asc(agents.createdAt));
     candidateIds.push(...roleCandidates.map((agent) => agent.id));
     if (issue.assigneeAgentId) candidateIds.push(issue.assigneeAgentId);
 

@@ -22,6 +22,8 @@ export async function loadDefaultAgentInstructionsBundle(role: DefaultAgentBundl
   return Object.fromEntries(entries);
 }
 
-export function resolveDefaultAgentInstructionsBundleRole(role: string): DefaultAgentBundleRole {
-  return role === "ceo" ? "ceo" : "default";
+// Autoresearch: all agents use the default instruction bundle.
+// No special CEO onboarding assets.
+export function resolveDefaultAgentInstructionsBundleRole(_role: string): DefaultAgentBundleRole {
+  return "default";
 }

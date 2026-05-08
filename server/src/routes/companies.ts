@@ -68,9 +68,8 @@ export function companyRoutes(db: Db, storage?: StorageService) {
     if (!actorAgent || actorAgent.companyId !== companyId) {
       throw forbidden("Agent key cannot access another company");
     }
-    if (actorAgent.role !== "ceo") {
-      throw forbidden("Only CEO agents can update company branding");
-    }
+    // Autoresearch: only the board updates company branding. No CEO role.
+    throw forbidden("Only the board can update company branding");
   }
 
   async function assertCanManagePortability(req: Request, companyId: string, capability: "imports" | "exports") {
@@ -284,7 +283,7 @@ export function companyRoutes(db: Db, storage?: StorageService) {
       await budgets.upsertPolicy(
         company.id,
         {
-          scopeType: "company",
+          scopeType: "project",
           scopeId: company.id,
           amount: company.budgetMonthlyCents,
           windowKind: "calendar_month_utc",
@@ -311,9 +310,10 @@ export function companyRoutes(db: Db, storage?: StorageService) {
       // Only CEO agents may update company branding fields
       const agentSvc = agentService(db);
       const actorAgent = req.actor.agentId ? await agentSvc.getById(req.actor.agentId) : null;
-      if (!actorAgent || actorAgent.role !== "ceo") {
-        throw forbidden("Only CEO agents or board users may update company settings");
-      }
+    // Autoresearch: board-only company settings. No CEO role.
+    if (req.actor.type === "agent") {
+      throw forbidden("Only the board may update company settings");
+    }
       if (actorAgent.companyId !== companyId) {
         throw forbidden("Agent key cannot access another company");
       }

@@ -371,51 +371,8 @@ export function pluginManagedAgentService(
     }) as Agent;
     created = await materializeDeclaredInstructions(companyId, created, declaration, { replaceExisting: true });
 
+    // Autoresearch: agents are created directly. No hire_agent approval needed.
     let approvalId: string | null = null;
-    if (requiresApproval) {
-      const approval = await approvalSvc.create(companyId, {
-        type: "hire_agent",
-        requestedByAgentId: null,
-        requestedByUserId: null,
-        status: "pending",
-        payload: {
-          name: created.name,
-          role: created.role,
-          title: created.title,
-          icon: created.icon,
-          reportsTo: created.reportsTo,
-          capabilities: created.capabilities,
-          adapterType: created.adapterType,
-          adapterConfig: created.adapterConfig,
-          runtimeConfig: created.runtimeConfig,
-          budgetMonthlyCents: created.budgetMonthlyCents,
-          metadata: created.metadata,
-          agentId: created.id,
-          sourcePluginId: options.pluginId,
-          sourcePluginKey: options.pluginKey,
-          managedResourceKey: declaration.agentKey,
-        },
-        decisionNote: null,
-        decidedByUserId: null,
-        decidedAt: null,
-        updatedAt: new Date(),
-      });
-      approvalId = approval.id;
-      await logActivity(db, {
-        companyId,
-        actorType: "plugin",
-        actorId: options.pluginId,
-        action: "approval.created",
-        entityType: "approval",
-        entityId: approval.id,
-        details: {
-          type: "hire_agent",
-          linkedAgentId: created.id,
-          sourcePluginKey: options.pluginKey,
-          managedResourceKey: declaration.agentKey,
-        },
-      });
-    }
 
     await upsertBinding(companyId, declaration, created.id, { approvalId }, adapterType);
     await logActivity(db, {
