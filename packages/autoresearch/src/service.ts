@@ -29,13 +29,14 @@ export interface RunEvalInput {
   cwd: string;
 }
 
-export function autoresearchService(db: PostgresJsDatabase) {
-  const drizzle = db;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function autoresearchService(db: any) {
+
 
   // ── Config ──────────────────────────────────────────────
 
   async function createConfig(input: CreateEvalConfigInput): Promise<EvalConfig> {
-    const [row] = await drizzle
+    const [row] = await db
       .insert(evalConfigs)
       .values({
         companyId: input.companyId,
@@ -51,7 +52,7 @@ export function autoresearchService(db: PostgresJsDatabase) {
   }
 
   async function getConfigByCompanyId(companyId: string): Promise<EvalConfig | null> {
-    const [row] = await drizzle
+    const [row] = await db
       .select()
       .from(evalConfigs)
       .where(eq(evalConfigs.companyId, companyId));
@@ -59,7 +60,7 @@ export function autoresearchService(db: PostgresJsDatabase) {
   }
 
   async function lockBaseline(companyId: string, ref: string): Promise<EvalConfig | null> {
-    const [row] = await drizzle
+    const [row] = await db
       .update(evalConfigs)
       .set({
         baselineRef: ref,
@@ -74,11 +75,11 @@ export function autoresearchService(db: PostgresJsDatabase) {
   // ── Run ─────────────────────────────────────────────────
 
   async function runEval(input: RunEvalInput): Promise<EvalResult> {
-    const config = await drizzle
+    const config = await db
       .select()
       .from(evalConfigs)
       .where(eq(evalConfigs.id, input.evalConfigId))
-      .then((rows) => rows[0] ?? null);
+      .then((rows: any[]) => rows[0] ?? null);
 
     if (!config) {
       return {
@@ -100,7 +101,7 @@ export function autoresearchService(db: PostgresJsDatabase) {
     });
 
     // Persist the run
-    await drizzle.insert(evalRuns).values({
+    await db.insert(evalRuns).values({
       evalConfigId: config.id,
       issueId: input.issueId,
       heartbeatRunId: input.heartbeatRunId ?? null,
@@ -115,7 +116,7 @@ export function autoresearchService(db: PostgresJsDatabase) {
 
     // Update best score if this was a keep
     if (result.disposition === "keep" && result.score !== null) {
-      await drizzle
+      await db
         .update(evalConfigs)
         .set({
           bestScore: result.score,
@@ -128,12 +129,12 @@ export function autoresearchService(db: PostgresJsDatabase) {
   }
 
   async function getRunById(id: string): Promise<EvalRun | null> {
-    const [row] = await drizzle.select().from(evalRuns).where(eq(evalRuns.id, id));
+    const [row] = await db.select().from(evalRuns).where(eq(evalRuns.id, id));
     return row ?? null;
   }
 
   async function listRuns(configId: string): Promise<EvalRun[]> {
-    return drizzle
+    return db
       .select()
       .from(evalRuns)
       .where(eq(evalRuns.evalConfigId, configId))
@@ -146,7 +147,7 @@ export function autoresearchService(db: PostgresJsDatabase) {
     const config = await getConfigByCompanyId(companyId);
     if (!config) return null;
 
-    const runs = await drizzle
+    const runs = await db
       .select()
       .from(evalRuns)
       .where(eq(evalRuns.evalConfigId, config.id))
