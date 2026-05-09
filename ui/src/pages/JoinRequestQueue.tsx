@@ -15,7 +15,7 @@ export function JoinRequestQueue() {
   const { setBreadcrumbs } = useBreadcrumbs();
   const { pushToast } = useToast();
   const queryClient = useQueryClient();
-  const [status, setStatus] = useState<"pending_approval" | "approved" | "rejected">("pending_approval");
+  const [status, setStatus] = useState<"idle" | "approved" | "rejected">("idle");
   const [requestType, setRequestType] = useState<"all" | "human" | "agent">("all");
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export function JoinRequestQueue() {
   });
 
   if (!selectedCompanyId) {
-    return <div className="text-sm text-muted-foreground">Select a company to review join requests.</div>;
+    return <div className="text-sm text-muted-foreground">Select a research project to review join requests.</div>;
   }
 
   if (requestsQuery.isLoading) {
@@ -92,10 +92,10 @@ export function JoinRequestQueue() {
             className="rounded-md border border-border bg-background px-3 py-2"
             value={status}
             onChange={(event) =>
-              setStatus(event.target.value as "pending_approval" | "approved" | "rejected")
+              setStatus(event.target.value as "idle" | "approved" | "rejected")
             }
           >
-            <option value="pending_approval">Pending approval</option>
+            <option value="idle">Pending approval</option>
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
           </select>

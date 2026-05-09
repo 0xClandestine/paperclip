@@ -103,7 +103,7 @@ describeEmbeddedPostgres("environment runtime driver contract", () => {
       id: agentId,
       companyId,
       name: "Contract Agent",
-      role: "engineer",
+      role: "general",
       status: "active",
       adapterType: "codex_local",
       adapterConfig: {},

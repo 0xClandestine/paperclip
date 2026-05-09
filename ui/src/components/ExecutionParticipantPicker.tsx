@@ -45,7 +45,7 @@ export function ExecutionParticipantPicker({
   });
 
   const sortedAgents = sortAgentsByRecency(
-    agents.filter((a) => a.status !== "terminated"),
+    agents.filter((a) => a.status !== "paused"),
     getRecentAssigneeIds(),
   );
   const userLabelMap = useMemo(

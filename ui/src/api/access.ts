@@ -309,7 +309,7 @@ export const accessApi = {
 
   listJoinRequests: (
     companyId: string,
-    status: "pending_approval" | "approved" | "rejected" = "pending_approval",
+    status: "idle" | "approved" | "rejected" = "idle",
     requestType?: "human" | "agent",
   ) =>
     api.get<CompanyJoinRequest[]>(

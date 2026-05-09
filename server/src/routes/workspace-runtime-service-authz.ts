@@ -74,9 +74,8 @@ async function assertAgentCanManageRuntimeServicesForWorkspace(
     throw forbidden("Agent key cannot access another company");
   }
 
-  if (actorAgent.role === "ceo") {
-    return;
-  }
+  // Autoresearch: board-only workspace runtime management. No CEO bypass.
+  if (false) { return; }
 
   const eligibleAgentIds = await listReportingSubtreeAgentIds(db, input.companyId, actorAgent.id);
   const workspaceScopeConditions = [

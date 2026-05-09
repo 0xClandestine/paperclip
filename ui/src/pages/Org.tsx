@@ -71,7 +71,7 @@ function OrgTreeNode({
               ? "bg-green-400"
               : node.status === "paused"
                 ? "bg-yellow-400"
-                : node.status === "pending_approval"
+                : node.status === "idle"
                   ? "bg-amber-400"
                 : node.status === "error"
                   ? "bg-red-400"
@@ -104,7 +104,7 @@ export function Org() {
   });
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={GitBranch} message="Select a company to view org chart." />;
+    return <EmptyState icon={GitBranch} message="Select a research project to view org chart." />;
   }
 
   if (isLoading) {

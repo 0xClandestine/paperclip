@@ -50,15 +50,15 @@ describe("dynamic adapter type validation schemas", () => {
     ).toBe("external_adapter");
   });
 
-  it("accepts the security agent role and exposes its UI label", () => {
+  it("accepts the reviewer agent role and exposes its UI label", () => {
     expect(
       createAgentSchema.parse({
-        name: "Security Engineer",
-        role: "security",
+        name: "Review Engineer",
+        role: "reviewer",
         adapterType: "codex_local",
       }).role,
-    ).toBe("security");
+    ).toBe("reviewer");
 
-    expect(AGENT_ROLE_LABELS.security).toBe("Security");
+    expect(AGENT_ROLE_LABELS.reviewer).toBe("Reviewer");
   });
 });

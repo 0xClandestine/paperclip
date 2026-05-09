@@ -77,14 +77,8 @@ export function approvalRoutes(
       : [];
     const uniqueIssueIds = Array.from(new Set(issueIds));
     const { issueIds: _issueIds, ...approvalInput } = req.body;
-    const normalizedPayload =
-      approvalInput.type === "hire_agent"
-        ? await secretsSvc.normalizeHireApprovalPayloadForPersistence(
-            companyId,
-            approvalInput.payload,
-            { strictMode: strictSecretsMode },
-          )
-        : approvalInput.payload;
+    // Autoresearch: no hire_agent type — use payload directly.
+    const normalizedPayload = approvalInput.payload;
 
     const actor = getActorInfo(req);
     const approval = await svc.create(companyId, {
@@ -295,14 +289,9 @@ export function approvalRoutes(
       return;
     }
 
+    // Autoresearch: no hire_agent type — normalize directly.
     const normalizedPayload = req.body.payload
-      ? existing.type === "hire_agent"
-        ? await secretsSvc.normalizeHireApprovalPayloadForPersistence(
-            existing.companyId,
-            req.body.payload,
-            { strictMode: strictSecretsMode },
-          )
-        : req.body.payload
+      ? req.body.payload
       : undefined;
     const approval = await svc.resubmit(id, normalizedPayload);
     const actor = getActorInfo(req);

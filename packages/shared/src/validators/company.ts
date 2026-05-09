@@ -18,6 +18,14 @@ export const createCompanySchema = z.object({
   description: z.string().optional().nullable(),
   budgetMonthlyCents: z.number().int().nonnegative().optional().default(0),
   attachmentMaxBytes: attachmentMaxBytesSchema.optional(),
+  /** Autoresearch: optional eval config fields. If provided, an eval config is created alongside the project. */
+  evalRepoUrl: z.string().url().optional(),
+  evalPath: z.string().min(1).optional(),
+  evalDirection: z.enum(["lower", "higher"]).optional(),
+  evalScoreUnit: z.string().optional(),
+  evalTimeoutMs: z.number().int().positive().optional(),
+  /** If set, an agent will generate the eval from this prompt. Mutually exclusive with evalPath. */
+  evalPrompt: z.string().optional(),
 });
 
 export type CreateCompany = z.infer<typeof createCompanySchema>;

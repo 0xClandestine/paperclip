@@ -192,7 +192,7 @@ describe("GET /invites/:token", () => {
     const app = await createApp(
       createDbStub(
         [invite],
-        [{ requestType: "human", status: "pending_approval" }],
+        [{ requestType: "human", status: "idle" }],
         [
           {
             name: "Acme Robotics",
@@ -238,7 +238,7 @@ describe("GET /invites/:token", () => {
     const reusableJoinRequest = {
       id: "join-1",
       requestType: "human",
-      status: "pending_approval",
+      status: "idle",
       requestingUserId: "user-1",
       requestEmailSnapshot: "jane@example.com",
     };

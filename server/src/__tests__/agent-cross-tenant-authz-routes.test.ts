@@ -14,7 +14,7 @@ const baseAgent = {
   companyId,
   name: "Builder",
   urlKey: "builder",
-  role: "engineer",
+  role: "general",
   title: "Builder",
   icon: null,
   status: "idle",

@@ -107,64 +107,7 @@ export function approvalService(db: Db) {
         decisionNote,
       );
 
-      let hireApprovedAgentId: string | null = null;
-      const now = new Date();
-      if (applied && updated.type === "hire_agent") {
-        const payload = updated.payload as Record<string, unknown>;
-        const payloadAgentId = typeof payload.agentId === "string" ? payload.agentId : null;
-        if (payloadAgentId) {
-          await agentsSvc.activatePendingApproval(payloadAgentId);
-          hireApprovedAgentId = payloadAgentId;
-        } else {
-          const created = await agentsSvc.create(updated.companyId, {
-            name: String(payload.name ?? "New Agent"),
-            role: String(payload.role ?? "general"),
-            title: typeof payload.title === "string" ? payload.title : null,
-            reportsTo: typeof payload.reportsTo === "string" ? payload.reportsTo : null,
-            capabilities: typeof payload.capabilities === "string" ? payload.capabilities : null,
-            adapterType: String(payload.adapterType ?? "process"),
-            adapterConfig:
-              typeof payload.adapterConfig === "object" && payload.adapterConfig !== null
-                ? (payload.adapterConfig as Record<string, unknown>)
-                : {},
-            budgetMonthlyCents:
-              typeof payload.budgetMonthlyCents === "number" ? payload.budgetMonthlyCents : 0,
-            metadata:
-              typeof payload.metadata === "object" && payload.metadata !== null
-                ? (payload.metadata as Record<string, unknown>)
-                : null,
-            status: "idle",
-            spentMonthlyCents: 0,
-            permissions: undefined,
-            lastHeartbeatAt: null,
-          });
-          hireApprovedAgentId = created?.id ?? null;
-        }
-        if (hireApprovedAgentId) {
-          const budgetMonthlyCents =
-            typeof payload.budgetMonthlyCents === "number" ? payload.budgetMonthlyCents : 0;
-          if (budgetMonthlyCents > 0) {
-            await budgets.upsertPolicy(
-              updated.companyId,
-              {
-                scopeType: "agent",
-                scopeId: hireApprovedAgentId,
-                amount: budgetMonthlyCents,
-                windowKind: "calendar_month_utc",
-              },
-              decidedByUserId,
-            );
-          }
-          void notifyHireApproved(db, {
-            companyId: updated.companyId,
-            agentId: hireApprovedAgentId,
-            source: "approval",
-            sourceId: id,
-            approvedAt: now,
-          }).catch(() => {});
-        }
-      }
-
+      // Autoresearch: agents are created directly, no hire_agent approval flow.
       return { approval: updated, applied };
     },
 
@@ -176,14 +119,7 @@ export function approvalService(db: Db) {
         decisionNote,
       );
 
-      if (applied && updated.type === "hire_agent") {
-        const payload = updated.payload as Record<string, unknown>;
-        const payloadAgentId = typeof payload.agentId === "string" ? payload.agentId : null;
-        if (payloadAgentId) {
-          await agentsSvc.terminate(payloadAgentId);
-        }
-      }
-
+      // Autoresearch: agents are created directly, no hire_agent termination on reject.
       return { approval: updated, applied };
     },
 

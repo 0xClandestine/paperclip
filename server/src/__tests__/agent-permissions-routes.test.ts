@@ -18,7 +18,7 @@ const baseAgent = {
   companyId,
   name: "Builder",
   urlKey: "builder",
-  role: "engineer",
+  role: "general",
   title: "Builder",
   icon: null,
   status: "idle",
@@ -719,7 +719,7 @@ describe.sequential("agent permission routes", () => {
       .post(`/api/companies/${companyId}/agent-hires`)
       .send({
         name: "Injected",
-        role: "engineer",
+        role: "general",
         adapterType: "codex_local",
         adapterConfig: {
           instructionsRootPath: "/etc",
@@ -748,7 +748,7 @@ describe.sequential("agent permission routes", () => {
       .post(`/api/companies/${companyId}/agents`)
       .send({
         name: "Backdoor",
-        role: "engineer",
+        role: "general",
         adapterType: "process",
         adapterConfig: {},
       }));
@@ -774,7 +774,7 @@ describe.sequential("agent permission routes", () => {
       .post(`/api/companies/${companyId}/agents`)
       .send({
         name: "Builder",
-        role: "engineer",
+        role: "general",
         adapterType: "process",
         adapterConfig: {},
       }));
@@ -812,7 +812,7 @@ describe.sequential("agent permission routes", () => {
       .post(`/api/companies/${companyId}/agents`)
       .send({
         name: "Builder",
-        role: "engineer",
+        role: "general",
         adapterType: "process",
         adapterConfig: {},
       }));
@@ -837,7 +837,7 @@ describe.sequential("agent permission routes", () => {
       .post(`/api/companies/${companyId}/agents`)
       .send({
         name: "Builder",
-        role: "engineer",
+        role: "general",
         adapterType: "process",
         adapterConfig: {},
       }));
@@ -891,7 +891,7 @@ describe.sequential("agent permission routes", () => {
       .post(`/api/companies/${companyId}/agents`)
       .send({
         name: "Builder",
-        role: "engineer",
+        role: "general",
         adapterType: "process",
         adapterConfig: {},
         runtimeConfig: {
@@ -933,7 +933,7 @@ describe.sequential("agent permission routes", () => {
       .post(`/api/companies/${companyId}/agents`)
       .send({
         name: "OpenCode Builder",
-        role: "engineer",
+        role: "general",
         adapterType: "opencode_local",
         adapterConfig: {},
       }));
@@ -968,7 +968,7 @@ describe.sequential("agent permission routes", () => {
       .post(`/api/companies/${companyId}/agents`)
       .send({
         name: "OpenCode Builder",
-        role: "engineer",
+        role: "general",
         adapterType: "opencode_local",
         adapterConfig: {
           model: "anthropic/claude-sonnet-4-5",
@@ -1001,7 +1001,7 @@ describe.sequential("agent permission routes", () => {
       .post(`/api/companies/${companyId}/agent-hires`)
       .send({
         name: "Builder",
-        role: "engineer",
+        role: "general",
         adapterType: "process",
         adapterConfig: {},
         runtimeConfig: {
@@ -1029,7 +1029,7 @@ describe.sequential("agent permission routes", () => {
   it("allows board users to directly approve pending agents", async () => {
     const pendingAgent = {
       ...baseAgent,
-      status: "pending_approval",
+      status: "idle",
     };
     const approvedAgent = {
       ...baseAgent,
@@ -1107,7 +1107,7 @@ describe.sequential("agent permission routes", () => {
       .post(`/api/companies/${companyId}/agents`)
       .send({
         name: "Builder",
-        role: "engineer",
+        role: "general",
         adapterType: "process",
         adapterConfig: {},
         defaultEnvironmentId: environmentId,
@@ -1139,7 +1139,7 @@ describe.sequential("agent permission routes", () => {
       .post(`/api/companies/${companyId}/agents`)
       .send({
         name: "Builder",
-        role: "engineer",
+        role: "general",
         adapterType: "process",
         adapterConfig: {},
         defaultEnvironmentId: environmentId,
@@ -1187,7 +1187,7 @@ describe.sequential("agent permission routes", () => {
         .post(`/api/companies/${companyId}/agents`)
         .send({
           name: adapterCase.name,
-          role: "engineer",
+          role: "general",
           adapterType: adapterCase.adapterType,
           adapterConfig: adapterCase.adapterConfig,
           defaultEnvironmentId: environmentId,

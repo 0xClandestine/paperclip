@@ -705,7 +705,7 @@ export function AgentDetail() {
   const assignedIssues = (allIssues ?? [])
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   const reportsToAgent = (allAgents ?? []).find((a) => a.id === agent?.reportsTo);
-  const directReports = (allAgents ?? []).filter((a) => a.reportsTo === agent?.id && a.status !== "terminated");
+  const directReports = (allAgents ?? []).filter((a) => a.reportsTo === agent?.id && a.status !== "paused");
   const agentBudgetSummary = useMemo(() => {
     const matched = budgetOverview?.policies.find(
       (policy) => policy.scopeType === "agent" && policy.scopeId === (agent?.id ?? routeAgentRef),
@@ -911,7 +911,7 @@ export function AgentDetail() {
   if (!urlRunId && !urlTab) {
     return <Navigate to={`/agents/${canonicalAgentRef}/dashboard`} replace />;
   }
-  const isPendingApproval = agent.status === "pending_approval";
+  const isPendingApproval = agent.status === "idle";
   const showConfigActionBar = (activeView === "configuration" || activeView === "instructions") && (configDirty || configSaving);
 
   return (
@@ -1605,15 +1605,14 @@ function ConfigurationTab({
   }, [onSavingChange, isConfigSaving]);
 
   const canCreateAgents = Boolean(agent.permissions?.canCreateAgents);
+  // Autoresearch: all agents can assign tasks. No CEO role gate.
   const canAssignTasks = Boolean(agent.access?.canAssignTasks);
   const taskAssignSource = agent.access?.taskAssignSource ?? "none";
-  const taskAssignLocked = agent.role === "ceo" || canCreateAgents;
+  const taskAssignLocked = canCreateAgents;
   const taskAssignHint =
-    taskAssignSource === "ceo_role"
-      ? "Enabled automatically for CEO agents."
-      : taskAssignSource === "agent_creator"
-        ? "Enabled automatically while this agent can create new agents."
-        : taskAssignSource === "explicit_grant"
+    taskAssignSource === "agent_creator"
+      ? "Enabled automatically while this agent can create new agents."
+      : taskAssignSource === "explicit_grant"
           ? "Enabled via explicit company permission grant."
           : "Disabled unless explicitly granted.";
 
@@ -1826,7 +1825,7 @@ function PromptsTab({
 
   const uploadMarkdownImage = useMutation({
     mutationFn: async ({ file, namespace }: { file: File; namespace: string }) => {
-      if (!selectedCompanyId) throw new Error("Select a company to upload images");
+      if (!selectedCompanyId) throw new Error("Select a research project to upload images");
       return assetsApi.uploadImage(selectedCompanyId, file, namespace);
     },
   });

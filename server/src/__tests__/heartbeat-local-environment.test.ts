@@ -105,7 +105,7 @@ describeEmbeddedPostgres("heartbeat local environment lifecycle", () => {
       id: agentId,
       companyId,
       name: "ProcessAgent",
-      role: "engineer",
+      role: "general",
       status: "idle",
       adapterType: "process",
       adapterConfig: {

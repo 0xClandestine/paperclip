@@ -27,7 +27,7 @@ const roleLabels = AGENT_ROLE_LABELS as Record<string, string>;
 type FilterTab = "all" | "active" | "paused" | "error";
 
 function matchesFilter(status: string, tab: FilterTab, showTerminated: boolean): boolean {
-  if (status === "terminated") return showTerminated;
+  if (status === "paused") return showTerminated;
   if (tab === "all") return true;
   if (tab === "active") return status === "active" || status === "running" || status === "idle";
   if (tab === "paused") return status === "paused";
@@ -120,7 +120,7 @@ export function Agents() {
   }, [setBreadcrumbs]);
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={Bot} message="Select a company to view agents." />;
+    return <EmptyState icon={Bot} message="Select a research project to view agents." />;
   }
 
   if (isLoading) {

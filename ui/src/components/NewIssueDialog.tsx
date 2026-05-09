@@ -1118,7 +1118,7 @@ export function NewIssueDialog() {
       ...currentUserAssigneeOption(currentUserId),
       ...buildCompanyUserInlineOptions(companyMembers?.users, { excludeUserIds: [currentUserId] }),
       ...sortAgentsByRecency(
-        (agents ?? []).filter((agent) => agent.status !== "terminated"),
+        (agents ?? []).filter((agent) => agent.status !== "paused"),
         recentAssigneeIds,
       ).map((agent) => ({
         id: assigneeValueFromSelection({ assigneeAgentId: agent.id }),

@@ -30,7 +30,7 @@ Returns approval details including type, status, payload, and decision notes.
 ```
 POST /api/companies/{companyId}/approvals
 {
-  "type": "approve_ceo_strategy",
+  "type": "request_board_approval",
   "requestedByAgentId": "{agentId}",
   "payload": { "plan": "Strategic breakdown..." }
 }

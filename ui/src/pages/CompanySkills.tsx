@@ -1080,7 +1080,7 @@ export function CompanySkills() {
   });
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={Boxes} message="Select a company to manage skills." />;
+    return <EmptyState icon={Boxes} message="Select a research project to manage skills." />;
   }
 
   function handleAddSkillSource() {

@@ -131,7 +131,7 @@ describeEmbeddedPostgres("companySkillService.detail", () => {
       id: randomUUID(),
       companyId,
       name: "Reviewer",
-      role: "engineer",
+      role: "general",
       adapterType: "codex_local",
       adapterConfig: {
         paperclipSkillSync: {
@@ -205,7 +205,7 @@ describeEmbeddedPostgres("companySkillService.detail", () => {
       id: randomUUID(),
       companyId,
       name: "Reviewer",
-      role: "engineer",
+      role: "general",
       adapterType: "codex_local",
       adapterConfig: {
         paperclipSkillSync: {

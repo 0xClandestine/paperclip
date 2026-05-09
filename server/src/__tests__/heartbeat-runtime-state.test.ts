@@ -63,7 +63,7 @@ describeEmbeddedPostgres("heartbeat runtime state deduplication", () => {
       id: agentId,
       companyId,
       name: "CodexCoder",
-      role: "engineer",
+      role: "general",
       status: "idle",
       adapterType: "codex_local",
       adapterConfig: {},

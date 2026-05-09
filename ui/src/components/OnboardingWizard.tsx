@@ -54,6 +54,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
+  FlaskConical,
   Loader2,
   ChevronDown,
   X
@@ -63,11 +64,11 @@ import {
 type Step = 1 | 2 | 3 | 4;
 type AdapterType = string;
 
-const DEFAULT_TASK_DESCRIPTION = `You are the CEO. You set the direction for the company.
+const DEFAULT_TASK_DESCRIPTION = `You are the lead researcher. You set the research direction for the project.
 
-- hire a founding engineer
-- write a hiring plan
-- break the roadmap into concrete tasks and start delegating work`;
+- create researcher agents for exploration, optimization, and review
+- write a research plan
+- break the research question into concrete experiments and start delegating work`;
 
 export function OnboardingWizard() {
   const { onboardingOpen, onboardingOptions, closeOnboarding } = useDialog();
@@ -108,8 +109,15 @@ export function OnboardingWizard() {
   const [companyName, setCompanyName] = useState("");
   const [companyGoal, setCompanyGoal] = useState("");
 
+  // Eval config (step 1, optional)
+  const [evalRepoUrl, setEvalRepoUrl] = useState("");
+  const [evalFilePath, setEvalFilePath] = useState("");
+  const [evalDirection, setEvalDirection] = useState<"lower" | "higher">("lower");
+  const [evalScoreUnit, setEvalScoreUnit] = useState("");
+  const [showEvalConfig, setShowEvalConfig] = useState(false);
+
   // Step 2
-  const [agentName, setAgentName] = useState("CEO");
+  const [agentName, setAgentName] = useState("Researcher");
   const [adapterType, setAdapterType] = useState<AdapterType>("claude_local");
   const [model, setModel] = useState("");
   const [command, setCommand] = useState("");
@@ -290,7 +298,7 @@ export function OnboardingWizard() {
     setError(null);
     setCompanyName("");
     setCompanyGoal("");
-    setAgentName("CEO");
+    setAgentName("Researcher");
     setAdapterType("claude_local");
     setModel("");
     setCommand("");
@@ -389,7 +397,15 @@ export function OnboardingWizard() {
     setLoading(true);
     setError(null);
     try {
-      const company = await companiesApi.create({ name: companyName.trim() });
+      const company = await companiesApi.create({
+        name: companyName.trim(),
+        ...(evalRepoUrl && evalFilePath ? {
+          evalRepoUrl,
+          evalPath: evalFilePath,
+          evalDirection,
+          evalScoreUnit: evalScoreUnit || undefined,
+        } : {}),
+      });
       setCreatedCompanyId(company.id);
       setCreatedCompanyPrefix(company.issuePrefix);
       setSelectedCompanyId(company.id);
@@ -402,7 +418,7 @@ export function OnboardingWizard() {
           ...(parsedGoal.description
             ? { description: parsedGoal.description }
             : {}),
-          level: "company",
+          level: "research_question",
           status: "active"
         });
         setCreatedCompanyGoalId(goal.id);
@@ -442,7 +458,7 @@ export function OnboardingWizard() {
 
       const hire = await agentsApi.hire(createdCompanyId, {
         name: agentName.trim(),
-        role: "ceo",
+        role: "explorer",
         adapterType,
         adapterConfig: buildAdapterConfig(),
         runtimeConfig: buildNewAgentRuntimeConfig()
@@ -663,9 +679,9 @@ export function OnboardingWizard() {
                       <Building2 className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <div>
-                      <h3 className="font-medium">Name your company</h3>
+                      <h3 className="font-medium">Name your research project</h3>
                       <p className="text-xs text-muted-foreground">
-                        This is the organization your agents will work for.
+                        This project will contain experiments and agents.
                       </p>
                     </div>
                   </div>
@@ -678,11 +694,11 @@ export function OnboardingWizard() {
                           : "text-muted-foreground group-focus-within:text-foreground"
                       )}
                     >
-                      Company name
+                      Project name
                     </label>
                     <input
                       className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/50"
-                      placeholder="Acme Corp"
+                      placeholder="JSON parser optimization"
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
                       autoFocus
@@ -697,14 +713,72 @@ export function OnboardingWizard() {
                           : "text-muted-foreground group-focus-within:text-foreground"
                       )}
                     >
-                      Mission / goal (optional)
+                      Research question (optional)
                     </label>
                     <textarea
                       className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/50 resize-none min-h-[60px]"
-                      placeholder="What is this company trying to achieve?"
+                      placeholder="What question is this project trying to answer?"
                       value={companyGoal}
                       onChange={(e) => setCompanyGoal(e.target.value)}
                     />
+                  </div>
+
+                  {/* Eval config (collapsible) */}
+                  <div className="border-t border-border pt-4">
+                    <button
+                      type="button"
+                      className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+                      onClick={() => setShowEvalConfig(!showEvalConfig)}
+                    >
+                      <FlaskConical className="h-4 w-4" />
+                      Eval benchmark {showEvalConfig ? "▾" : "▸"}
+                      <span className="text-xs">(optional — auto-score experiments)</span>
+                    </button>
+                    {showEvalConfig && (
+                      <div className="mt-3 space-y-3 pl-6">
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-1 block">GitHub repo URL</label>
+                          <input
+                            className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
+                            placeholder="https://github.com/user/repo"
+                            value={evalRepoUrl}
+                            onChange={(e) => setEvalRepoUrl(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-1 block">Eval file path</label>
+                          <input
+                            className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
+                            placeholder="eval.sh"
+                            value={evalFilePath}
+                            onChange={(e) => setEvalFilePath(e.target.value)}
+                          />
+                          <p className="text-[10px] text-muted-foreground mt-1">Path to the eval script in the repo. Must print a number or {'{"score": N}'} on stdout.</p>
+                        </div>
+                        <div className="flex gap-3">
+                          <div className="flex-1">
+                            <label className="text-xs text-muted-foreground mb-1 block">Direction</label>
+                            <select
+                              className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
+                              value={evalDirection}
+                              onChange={(e) => setEvalDirection(e.target.value as "lower" | "higher")}
+                            >
+                              <option value="lower">Lower is better (e.g. µs)</option>
+                              <option value="higher">Higher is better (e.g. throughput)</option>
+                            </select>
+                          </div>
+                          <div className="flex-1">
+                            <label className="text-xs text-muted-foreground mb-1 block">Score unit</label>
+                            <input
+                              className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
+                              placeholder="µs"
+                              value={evalScoreUnit}
+                              onChange={(e) => setEvalScoreUnit(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -728,7 +802,7 @@ export function OnboardingWizard() {
                     </label>
                     <input
                       className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/50"
-                      placeholder="CEO"
+                      placeholder="Researcher"
                       value={agentName}
                       onChange={(e) => setAgentName(e.target.value)}
                       autoFocus
@@ -986,7 +1060,7 @@ export function OnboardingWizard() {
                           <p className="text-[11px] text-amber-900/90 leading-relaxed">
                             Claude failed while{" "}
                             <span className="font-mono">ANTHROPIC_API_KEY</span>{" "}
-                            is set. You can clear it in this CEO adapter config
+                            is set. You can clear it in this adapter config
                             and retry the probe.
                           </p>
                           <Button

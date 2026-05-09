@@ -1515,7 +1515,7 @@ export function IssueDetail() {
     const options: Array<{ id: string; label: string; searchText?: string }> = [];
     options.push(...buildCompanyUserInlineOptions(companyMembers?.users, { excludeUserIds: [currentUserId] }));
     const activeAgents = [...(agents ?? [])]
-      .filter((agent) => agent.status !== "terminated")
+      .filter((agent) => agent.status !== "paused")
       .sort((a, b) => a.name.localeCompare(b.name));
     for (const agent of activeAgents) {
       options.push({ id: `agent:${agent.id}`, label: agent.name });

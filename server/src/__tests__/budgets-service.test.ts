@@ -212,7 +212,7 @@ describe("budgetService", () => {
     const block = await service.getInvocationBlock("company-1", "agent-1");
 
     expect(block).toEqual({
-      scopeType: "company",
+      scopeType: "project",
       scopeId: "company-1",
       scopeName: "Paperclip",
       reason: "Company is paused because its budget hard-stop was reached.",
@@ -231,7 +231,7 @@ describe("budgetService", () => {
       [{
         id: "policy-1",
         companyId: "company-1",
-        scopeType: "company",
+        scopeType: "project",
         scopeId: "company-1",
         metric: "billed_cents",
         windowKind: "calendar_month_utc",
@@ -258,7 +258,7 @@ describe("budgetService", () => {
         id: "incident-1",
         companyId: "company-1",
         policyId: "policy-1",
-        scopeType: "company",
+        scopeType: "project",
         scopeId: "company-1",
         metric: "billed_cents",
         windowKind: "calendar_month_utc",
@@ -276,7 +276,7 @@ describe("budgetService", () => {
       [{
         id: "policy-1",
         companyId: "company-1",
-        scopeType: "company",
+        scopeType: "project",
         scopeId: "company-1",
         metric: "billed_cents",
         windowKind: "calendar_month_utc",

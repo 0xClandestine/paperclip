@@ -534,11 +534,12 @@ export function productivityReviewService(db: Db, deps?: { enqueueWakeup?: Enque
         .then((rows) => rows[0] ?? null);
       if (project?.leadAgentId) candidateIds.push(project.leadAgentId);
     }
+    // Autoresearch: escalate to all active agents in the project (no CTO/CEO roles).
     const roleCandidates = await db
       .select({ id: agents.id })
       .from(agents)
-      .where(and(eq(agents.companyId, sourceIssue.companyId), inArray(agents.role, ["cto", "ceo"])))
-      .orderBy(sql`case when ${agents.role} = 'cto' then 0 else 1 end`, asc(agents.createdAt), asc(agents.id));
+      .where(and(eq(agents.companyId, sourceIssue.companyId), eq(agents.status, "active")))
+      .orderBy(asc(agents.createdAt), asc(agents.id));
     candidateIds.push(...roleCandidates.map((agent) => agent.id));
 
     const seen = new Set<string>();

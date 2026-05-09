@@ -152,7 +152,7 @@ describe("CompanyAccess", () => {
       {
         id: "agent-1",
         name: "Codex Worker",
-        role: "engineer",
+        role: "general",
         status: "active",
       },
     ]);

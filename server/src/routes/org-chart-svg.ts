@@ -135,19 +135,14 @@ const ROLE_ICONS: Record<string, {
   },
 };
 
+// Autoresearch: map agent roles to visual tags for the org chart.
+// No C-suite roles — use research roles.
 function guessRoleTag(node: OrgNode): string {
-  const name = node.name.toLowerCase();
   const role = node.role.toLowerCase();
-  if (name === "ceo" || role.includes("chief executive")) return "ceo";
-  if (name === "cto" || role.includes("chief technology") || role.includes("technology")) return "cto";
-  if (name === "cmo" || role.includes("chief marketing") || role.includes("marketing")) return "cmo";
-  if (name === "cfo" || role.includes("chief financial")) return "cfo";
-  if (name === "coo" || role.includes("chief operating")) return "coo";
-  if (role.includes("engineer") || role.includes("eng")) return "engineer";
-  if (role.includes("quality") || role.includes("qa")) return "quality";
-  if (role.includes("design")) return "design";
-  if (role.includes("finance")) return "finance";
-  if (role.includes("operations") || role.includes("ops")) return "operations";
+  if (role === "explorer" || role.includes("explor")) return "explorer";
+  if (role === "optimizer" || role.includes("optim")) return "optimizer";
+  if (role === "reviewer" || role.includes("review")) return "reviewer";
+  if (role.includes("researcher") || role.includes("research")) return "researcher";
   return "default";
 }
 
@@ -213,7 +208,7 @@ const THEMES: Record<OrgChartStyle, StyleTheme> = {
     cardAccent: null,
   },
 
-  // 03 — Circuit (Linear/Raycast — indigo traces, amethyst CEO)
+  // 03 — Circuit (Linear/Raycast — indigo traces, amethyst lead)
   circuit: {
     bgColor: "#0c0c0e",
     cardBg: "rgba(99,102,241,0.04)",
@@ -231,9 +226,9 @@ const THEMES: Record<OrgChartStyle, StyleTheme> = {
     renderCard: (ln: LayoutNode, theme: StyleTheme) => {
       const { tag, roleLabel, emojiSvg } = getRoleInfo(ln.node);
       const cx = ln.x + ln.width / 2;
-      const isCeo = tag === "ceo";
-      const borderColor = isCeo ? "rgba(168,85,247,0.35)" : theme.cardBorder;
-      const bgColor = isCeo ? "rgba(168,85,247,0.06)" : theme.cardBg;
+      const isLead = tag === "explorer";
+      const borderColor = isLead ? "rgba(168,85,247,0.35)" : theme.cardBorder;
+      const bgColor = isLead ? "rgba(168,85,247,0.06)" : theme.cardBg;
 
       const avatarCY = ln.y + 27;
       const nameY = ln.y + 66;

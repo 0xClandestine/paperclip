@@ -1,9 +1,8 @@
 import { UserPlus, Lightbulb, ShieldAlert, ShieldCheck } from "lucide-react";
 import { formatCents } from "../lib/utils";
 
+// Autoresearch: no hire or CEO strategy approval types.
 export const typeLabel: Record<string, string> = {
-  hire_agent: "Hire Agent",
-  approve_ceo_strategy: "CEO Strategy",
   budget_override_required: "Budget Override",
   request_board_approval: "Board Approval",
 };
@@ -36,9 +35,8 @@ export function approvalLabel(type: string, payload?: Record<string, unknown> | 
   return base;
 }
 
+// Autoresearch icon mappings — no hire or CEO strategy.
 export const typeIcon: Record<string, typeof UserPlus> = {
-  hire_agent: UserPlus,
-  approve_ceo_strategy: Lightbulb,
   budget_override_required: ShieldAlert,
   request_board_approval: ShieldCheck,
 };
@@ -238,10 +236,9 @@ export function ApprovalPayloadRenderer({
   payload: Record<string, unknown>;
   hidePrimaryTitle?: boolean;
 }) {
-  if (type === "hire_agent") return <HireAgentPayload payload={payload} />;
-  if (type === "budget_override_required") return <BudgetOverridePayload payload={payload} />;
   if (type === "request_board_approval") {
     return <BoardApprovalPayload payload={payload} hideTitle={hidePrimaryTitle} />;
   }
+  if (type === "budget_override_required") return <BudgetOverridePayload payload={payload} />;
   return <CeoStrategyPayload payload={payload} />;
 }

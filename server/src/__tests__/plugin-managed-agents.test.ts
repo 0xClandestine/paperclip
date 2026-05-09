@@ -56,7 +56,7 @@ function manifest(): PaperclipPluginManifestV1 {
       {
         agentKey: "wiki-maintainer",
         displayName: "Wiki Maintainer",
-        role: "engineer",
+        role: "general",
         title: "Maintains plugin-owned knowledge",
         capabilities: "Maintains a plugin-owned wiki.",
         adapterType: "process",
@@ -139,7 +139,7 @@ describeEmbeddedPostgres("plugin-managed agents", () => {
     expect(created.agentId).toBeTruthy();
     expect(created.agent).toMatchObject({
       name: "Wiki Maintainer",
-      role: "engineer",
+      role: "general",
       adapterConfig: { command: "pnpm wiki:maintain" },
     });
 
@@ -204,7 +204,7 @@ describeEmbeddedPostgres("plugin-managed agents", () => {
         id: randomUUID(),
         companyId,
         name: "Codex One",
-        role: "engineer",
+        role: "general",
         status: "idle",
         adapterType: "codex_local",
         adapterConfig: {},
@@ -215,7 +215,7 @@ describeEmbeddedPostgres("plugin-managed agents", () => {
         id: randomUUID(),
         companyId,
         name: "Codex Two",
-        role: "engineer",
+        role: "general",
         status: "idle",
         adapterType: "codex_local",
         adapterConfig: {},
@@ -226,7 +226,7 @@ describeEmbeddedPostgres("plugin-managed agents", () => {
         id: randomUUID(),
         companyId,
         name: "Claude One",
-        role: "engineer",
+        role: "general",
         status: "idle",
         adapterType: "claude_local",
         adapterConfig: {},
@@ -318,7 +318,7 @@ describeEmbeddedPostgres("plugin-managed agents", () => {
       id: agentId,
       companyId,
       name: "Renamed Wiki Agent",
-      role: "engineer",
+      role: "general",
       status: "idle",
       adapterType: "process",
       adapterConfig: { command: "custom" },
@@ -353,7 +353,7 @@ describeEmbeddedPostgres("plugin-managed agents", () => {
 
     const [approval] = await db.select().from(approvals).where(eq(approvals.id, created.approvalId!));
     expect(approval).toMatchObject({
-      type: "hire_agent",
+      type: "request_board_approval",
       status: "pending",
     });
     expect(approval?.payload).toMatchObject({

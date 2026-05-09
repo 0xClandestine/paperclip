@@ -3,16 +3,12 @@
  */
 import type { CompanyPortabilityManifest } from "@paperclipai/shared";
 
+// Autoresearch role labels — no C-suite. Research roles only.
 const ROLE_LABELS: Record<string, string> = {
-  ceo: "CEO",
-  cto: "CTO",
-  cmo: "CMO",
-  cfo: "CFO",
-  coo: "COO",
-  vp: "VP",
-  manager: "Manager",
-  engineer: "Engineer",
-  agent: "Agent",
+  explorer: "Explorer",
+  optimizer: "Optimizer",
+  reviewer: "Reviewer",
+  general: "General",
 };
 
 /**

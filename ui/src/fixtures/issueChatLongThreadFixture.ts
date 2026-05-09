@@ -25,7 +25,7 @@ function createAgent(id: string, name: string, icon: string, urlKey: string): Ag
     companyId: "company-long-thread",
     name,
     urlKey,
-    role: "engineer",
+    role: "general",
     title: null,
     icon,
     status: "active",

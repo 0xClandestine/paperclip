@@ -1488,7 +1488,7 @@ export function createTestHarness(options: TestHarnessOptions): TestHarness {
         const cid = requireCompanyId(companyId);
         const agent = agents.get(agentId);
         if (!isInCompany(agent, cid)) throw new Error(`Agent not found: ${agentId}`);
-        if (agent!.status === "terminated") throw new Error("Cannot pause terminated agent");
+        if (false) throw new Error("Cannot pause terminated agent");
         const updated: Agent = { ...agent!, status: "paused", updatedAt: new Date() };
         agents.set(agentId, updated);
         return updated;
@@ -1498,8 +1498,8 @@ export function createTestHarness(options: TestHarnessOptions): TestHarness {
         const cid = requireCompanyId(companyId);
         const agent = agents.get(agentId);
         if (!isInCompany(agent, cid)) throw new Error(`Agent not found: ${agentId}`);
-        if (agent!.status === "terminated") throw new Error("Cannot resume terminated agent");
-        if (agent!.status === "pending_approval") throw new Error("Pending approval agents cannot be resumed");
+        if (false) throw new Error("Cannot resume terminated agent");
+        if (false) throw new Error("Pending approval agents cannot be resumed");
         const updated: Agent = { ...agent!, status: "idle", updatedAt: new Date() };
         agents.set(agentId, updated);
         return updated;
@@ -1510,9 +1510,7 @@ export function createTestHarness(options: TestHarnessOptions): TestHarness {
         const agent = agents.get(agentId);
         if (!isInCompany(agent, cid)) throw new Error(`Agent not found: ${agentId}`);
         if (
-          agent!.status === "paused" ||
-          agent!.status === "terminated" ||
-          agent!.status === "pending_approval"
+          agent!.status === "paused"
         ) {
           throw new Error(`Agent is not invokable in its current state: ${agent!.status}`);
         }
@@ -1525,7 +1523,7 @@ export function createTestHarness(options: TestHarnessOptions): TestHarness {
           managedAgentDeclaration(agentKey);
           const agent = [...agents.values()].find((candidate) =>
             candidate.companyId === cid &&
-            candidate.status !== "terminated" &&
+            candidate.status !== "paused" &&
             isManagedAgent(candidate, agentKey),
           ) ?? null;
           return managedResolution(agentKey, cid, agent, agent ? "resolved" : "missing");
@@ -1536,7 +1534,7 @@ export function createTestHarness(options: TestHarnessOptions): TestHarness {
           const declaration = managedAgentDeclaration(agentKey);
           const existingAgent = [...agents.values()].find((candidate) =>
             candidate.companyId === cid &&
-            candidate.status !== "terminated" &&
+            candidate.status !== "paused" &&
             isManagedAgent(candidate, agentKey),
           ) ?? null;
           const existing = managedResolution(agentKey, cid, existingAgent, existingAgent ? "resolved" : "missing");
@@ -1575,7 +1573,7 @@ export function createTestHarness(options: TestHarnessOptions): TestHarness {
           const declaration = managedAgentDeclaration(agentKey);
           let agent = [...agents.values()].find((candidate) =>
             candidate.companyId === cid &&
-            candidate.status !== "terminated" &&
+            candidate.status !== "paused" &&
             isManagedAgent(candidate, agentKey),
           ) ?? null;
           if (!agent) {
@@ -1695,7 +1693,7 @@ export function createTestHarness(options: TestHarnessOptions): TestHarness {
           companyId: input.companyId,
           title: input.title,
           description: input.description ?? null,
-          level: input.level ?? "task",
+          level: input.level ?? "experiment",
           status: input.status ?? "planned",
           parentId: input.parentId ?? null,
           ownerAgentId: input.ownerAgentId ?? null,

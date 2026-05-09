@@ -40,7 +40,7 @@ function buildAgent(adapterType: string, runtimeConfig: Record<string, unknown> 
     projectId: null,
     goalId: null,
     name: "Agent",
-    role: "engineer",
+    role: "general",
     title: null,
     icon: null,
     status: "running",

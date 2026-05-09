@@ -473,14 +473,13 @@ export function agentRoutes(
       : [];
     const hasExplicitTaskAssignGrant = grants.some((grant) => grant.permissionKey === "tasks:assign");
 
-    if (agent.role === "ceo") {
-      return {
-        canAssignTasks: true,
-        taskAssignSource: "ceo_role" as const,
-        membership,
-        grants,
-      };
-    }
+    // Autoresearch: all agents can assign tasks. No special CEO role.
+    return {
+      canAssignTasks: true,
+      taskAssignSource: "agent_creator" as const,
+      membership,
+      grants,
+    };
 
     if (canCreateAgents(agent)) {
       return {
@@ -682,16 +681,10 @@ export function agentRoutes(
       throw forbidden("Agent key cannot access another company");
     }
 
+    // Autoresearch: only the board modifies agent config. Agents are peers.
+    // Agents can still modify themselves.
     if (actorAgent.id === targetAgent.id) return;
-    if (actorAgent.role === "ceo") return;
-    const allowedByGrant = await access.hasPermission(
-      targetAgent.companyId,
-      "agent",
-      actorAgent.id,
-      "agents:create",
-    );
-    if (allowedByGrant || canCreateAgents(actorAgent)) return;
-    throw forbidden("Only CEO or agent creators can modify other agents");
+    throw forbidden("Only the board can modify other agents");
   }
 
   async function assertCanReadAgent(req: Request, targetAgent: { companyId: string }) {
@@ -1666,9 +1659,7 @@ export function agentRoutes(
         };
       })
       .filter((item) =>
-        item.status !== "paused" &&
-        item.status !== "terminated" &&
-        item.status !== "pending_approval",
+        item.status !== "paused"
       )
       .sort((left, right) => {
         if (left.schedulerActive !== right.schedulerActive) {
@@ -2004,8 +1995,8 @@ export function agentRoutes(
       return;
     }
 
-    const requiresApproval = company.requireBoardApprovalForNewAgents;
-    const status = requiresApproval ? "pending_approval" : "idle";
+    // Autoresearch: agents are created directly — no hire approval flow.
+    const status = "idle";
     const createdAgent = await svc.create(companyId, {
       ...normalizedHireInput,
       status,
@@ -2016,64 +2007,6 @@ export function agentRoutes(
 
     let approval: Awaited<ReturnType<typeof approvalsSvc.getById>> | null = null;
     const actor = getActorInfo(req);
-
-    if (requiresApproval) {
-      const requestedAdapterType = normalizedHireInput.adapterType ?? agent.adapterType;
-      const requestedAdapterConfig =
-        redactEventPayload(
-          (agent.adapterConfig ?? normalizedHireInput.adapterConfig) as Record<string, unknown>,
-        ) ?? {};
-      const requestedRuntimeConfig =
-        redactEventPayload(
-          (normalizedHireInput.runtimeConfig ?? agent.runtimeConfig) as Record<string, unknown>,
-        ) ?? {};
-      const requestedMetadata =
-        redactEventPayload(
-          ((normalizedHireInput.metadata ?? agent.metadata ?? {}) as Record<string, unknown>),
-        ) ?? {};
-      approval = await approvalsSvc.create(companyId, {
-        type: "hire_agent",
-        requestedByAgentId: actor.actorType === "agent" ? actor.actorId : null,
-        requestedByUserId: actor.actorType === "user" ? actor.actorId : null,
-        status: "pending",
-        payload: {
-          name: normalizedHireInput.name,
-          role: normalizedHireInput.role,
-          title: normalizedHireInput.title ?? null,
-          icon: normalizedHireInput.icon ?? null,
-          reportsTo: normalizedHireInput.reportsTo ?? null,
-          capabilities: normalizedHireInput.capabilities ?? null,
-          adapterType: requestedAdapterType,
-          adapterConfig: requestedAdapterConfig,
-          runtimeConfig: requestedRuntimeConfig,
-          budgetMonthlyCents:
-            typeof normalizedHireInput.budgetMonthlyCents === "number"
-              ? normalizedHireInput.budgetMonthlyCents
-              : agent.budgetMonthlyCents,
-          desiredSkills: desiredSkillAssignment.desiredSkills,
-          metadata: requestedMetadata,
-          agentId: agent.id,
-          requestedByAgentId: actor.actorType === "agent" ? actor.actorId : null,
-          requestedConfigurationSnapshot: {
-            adapterType: requestedAdapterType,
-            adapterConfig: requestedAdapterConfig,
-            runtimeConfig: requestedRuntimeConfig,
-            desiredSkills: desiredSkillAssignment.desiredSkills,
-          },
-        },
-        decisionNote: null,
-        decidedByUserId: null,
-        decidedAt: null,
-        updatedAt: new Date(),
-      });
-
-      if (sourceIssueIds.length > 0) {
-        await issueApprovalsSvc.linkManyForApproval(approval.id, sourceIssueIds, {
-          agentId: actor.actorType === "agent" ? actor.actorId : null,
-          userId: actor.actorType === "user" ? actor.actorId : null,
-        });
-      }
-    }
 
     await logActivity(db, {
       companyId,
@@ -2087,8 +2020,7 @@ export function agentRoutes(
       details: {
         name: agent.name,
         role: agent.role,
-        requiresApproval,
-        approvalId: approval?.id ?? null,
+        requiresApproval: false,
         issueIds: sourceIssueIds,
         desiredSkills: desiredSkillAssignment.desiredSkills,
       },
@@ -2104,21 +2036,8 @@ export function agentRoutes(
       actor.actorType === "user" ? actor.actorId : null,
     );
 
-    if (approval) {
-      await logActivity(db, {
-        companyId,
-        actorType: actor.actorType,
-        actorId: actor.actorId,
-        agentId: actor.agentId,
-        runId: actor.runId,
-        action: "approval.created",
-        entityType: "approval",
-        entityId: approval.id,
-        details: { type: approval.type, linkedAgentId: agent.id },
-      });
-    }
-
-    res.status(201).json({ agent, approval });
+    // Autoresearch: no approval needed for agent creation.
+    res.status(201).json({ agent, approval: null });
   });
 
   router.post("/companies/:companyId/agents", validate(createAgentSchema), async (req, res) => {
@@ -2248,8 +2167,9 @@ export function agentRoutes(
         res.status(403).json({ error: "Forbidden" });
         return;
       }
-      if (actorAgent.role !== "ceo") {
-        res.status(403).json({ error: "Only CEO can manage permissions" });
+      // Autoresearch: board-only permission management. Agents are peers.
+      if (req.actor.type === "agent") {
+        res.status(403).json({ error: "Only the board can manage agent permissions" });
         return;
       }
     } else {
@@ -2263,7 +2183,7 @@ export function agentRoutes(
     }
 
     const effectiveCanAssignTasks =
-      agent.role === "ceo" || Boolean(agent.permissions?.canCreateAgents) || req.body.canAssignTasks;
+      Boolean(agent.permissions?.canCreateAgents) || req.body.canAssignTasks;
     await access.ensureMembership(agent.companyId, "agent", agent.id, "member", "active");
     await access.setPrincipalPermission(
       agent.companyId,

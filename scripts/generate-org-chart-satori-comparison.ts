@@ -24,7 +24,7 @@ import {
 
 const ORGS: Record<string, OrgNode> = {
   sm: {
-    id: "ceo",
+    id: "explorer",
     name: "CEO",
     role: "Chief Executive",
     status: "active",
@@ -34,13 +34,13 @@ const ORGS: Record<string, OrgNode> = {
     ],
   },
   med: {
-    id: "ceo",
+    id: "explorer",
     name: "CEO",
     role: "Chief Executive",
     status: "active",
     reports: [
       {
-        id: "cto",
+        id: "optimizer",
         name: "CTO",
         role: "Technology",
         status: "active",
@@ -53,7 +53,7 @@ const ORGS: Record<string, OrgNode> = {
         ],
       },
       {
-        id: "cmo",
+        id: "general",
         name: "CMO",
         role: "Marketing",
         status: "active",
@@ -64,13 +64,13 @@ const ORGS: Record<string, OrgNode> = {
     ],
   },
   lg: {
-    id: "ceo",
+    id: "explorer",
     name: "CEO",
     role: "Chief Executive",
     status: "active",
     reports: [
       {
-        id: "cto",
+        id: "optimizer",
         name: "CTO",
         role: "Technology",
         status: "active",
@@ -82,7 +82,7 @@ const ORGS: Record<string, OrgNode> = {
         ],
       },
       {
-        id: "cmo",
+        id: "general",
         name: "CMO",
         role: "Marketing",
         status: "active",
@@ -92,7 +92,7 @@ const ORGS: Record<string, OrgNode> = {
         ],
       },
       {
-        id: "cfo",
+        id: "reviewer",
         name: "CFO",
         role: "Finance",
         status: "active",

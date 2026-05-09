@@ -163,6 +163,7 @@ import { environmentService } from "./environments.js";
 import { environmentRuntimeService } from "./environment-runtime.js";
 import { environmentRunOrchestrator } from "./environment-run-orchestrator.js";
 import type { PluginWorkerManager } from "./plugin-worker-manager.js";
+import { autoresearchService } from "@paperclipai/autoresearch";
 
 const MAX_LIVE_LOG_CHUNK_BYTES = 8 * 1024;
 const MAX_PERSISTED_LOG_CHUNK_CHARS = 64 * 1024;
@@ -2305,6 +2306,7 @@ export function heartbeatService(db: Db, options: HeartbeatServiceOptions = {}) 
   const budgets = budgetService(db, budgetHooks);
   const recovery = recoveryService(db, { enqueueWakeup });
   const productivityReviews = productivityReviewService(db, { enqueueWakeup });
+  const evalSvc = autoresearchService(db);
   let unsafeTextProjectionPromise: Promise<boolean> | null = null;
 
   async function releaseEnvironmentLeasesForRun(input: {
@@ -7814,6 +7816,28 @@ export function heartbeatService(db: Db, options: HeartbeatServiceOptions = {}) 
             );
           }
         }
+        if (issueId && outcome === "succeeded" && executionWorkspace.cwd) {
+          try {
+            const evalConfig = await evalSvc.getConfigByCompanyId(livenessRun.companyId);
+            if (evalConfig) {
+              const evalResult = await evalSvc.runEval({
+                evalConfigId: evalConfig.id,
+                issueId,
+                heartbeatRunId: livenessRun.id,
+                cwd: executionWorkspace.cwd,
+              });
+              await onLog(
+                "stdout",
+                `[paperclip] eval ${evalResult.disposition}: score=${evalResult.score ?? "n/a"} (${evalResult.durationMs}ms)\n`,
+              );
+            }
+          } catch (err) {
+            await onLog(
+              "stderr",
+              `[paperclip] Eval failed: ${err instanceof Error ? err.message : String(err)}\n`,
+            );
+          }
+        }
         if (outcome === "failed" && isMaxTurnExhaustionRun(livenessRun)) {
           const policy = parseMaxTurnContinuationPolicy(agent);
           if (policy.enabled && policy.maxAttempts > 0) {
@@ -9189,7 +9213,7 @@ export function heartbeatService(db: Db, options: HeartbeatServiceOptions = {}) 
     const now = new Date();
     let wakeupIds: string[] = [];
 
-    if (scope.scopeType === "company") {
+    if (scope.scopeType === "project") {
       wakeupIds = await db
         .select({ id: agentWakeupRequests.id })
         .from(agentWakeupRequests)
@@ -9341,7 +9365,7 @@ export function heartbeatService(db: Db, options: HeartbeatServiceOptions = {}) 
     }
 
     const runIds =
-      scope.scopeType === "company"
+      scope.scopeType === "project"
         ? await db
           .select({ id: heartbeatRuns.id })
           .from(heartbeatRuns)

@@ -429,7 +429,7 @@ export function OrgChart() {
   }, [pan, zoom]);
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={Network} message="Select a company to view the org chart." />;
+    return <EmptyState icon={Network} message="Select a research project to view the org chart." />;
   }
 
   if (isLoading) {

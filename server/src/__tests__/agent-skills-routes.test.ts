@@ -197,7 +197,7 @@ function makeAgent(adapterType: string) {
     id: "11111111-1111-4111-8111-111111111111",
     companyId: "company-1",
     name: "Agent",
-    role: "engineer",
+    role: "general",
     title: "Engineer",
     status: "active",
     reportsTo: null,
@@ -296,7 +296,7 @@ describe.sequential("agent skill routes", () => {
     mockApprovalService.create.mockImplementation(async (_companyId: string, input: Record<string, unknown>) => ({
       id: "approval-1",
       companyId: "company-1",
-      type: "hire_agent",
+      type: "request_board_approval",
       status: "pending",
       payload: input.payload ?? {},
     }));
@@ -512,7 +512,7 @@ describe.sequential("agent skill routes", () => {
       .post("/api/companies/company-1/agents")
       .send({
         name: "QA Agent",
-        role: "engineer",
+        role: "general",
         adapterType: "claude_local",
         desiredSkills: ["paperclip"],
         adapterConfig: {},
@@ -543,19 +543,19 @@ describe.sequential("agent skill routes", () => {
       .post("/api/companies/company-1/agents")
       .send({
         name: "Security Engineer",
-        role: "security",
+        role: "reviewer",
         adapterType: "claude_local",
         adapterConfig: {},
       }));
 
     expect([200, 201], JSON.stringify(res.body)).toContain(res.status);
     expect(res.body).toMatchObject({
-      role: "security",
+      role: "reviewer",
     });
     expect(mockAgentService.create).toHaveBeenCalledWith(
       "company-1",
       expect.objectContaining({
-        role: "security",
+        role: "reviewer",
       }),
     );
     expect(mockTrackAgentCreated).toHaveBeenCalledWith(
@@ -572,7 +572,7 @@ describe.sequential("agent skill routes", () => {
       .post("/api/companies/company-1/agents")
       .send({
         name: "QA Agent",
-        role: "engineer",
+        role: "general",
         adapterType: "claude_local",
         adapterConfig: {},
         instructionsBundle: {
@@ -605,7 +605,7 @@ describe.sequential("agent skill routes", () => {
       .post("/api/companies/company-1/agents")
       .send({
         name: "QA Agent",
-        role: "engineer",
+        role: "general",
         adapterType: "claude_local",
         adapterConfig: {
           instructionsFilePath: "/tmp/existing/AGENTS.md",
@@ -624,8 +624,8 @@ describe.sequential("agent skill routes", () => {
     const res = await requestApp(await createApp(), (baseUrl) => request(baseUrl)
       .post("/api/companies/company-1/agents")
       .send({
-        name: "CEO",
-        role: "ceo",
+        name: "Lead Researcher",
+        role: "explorer",
         adapterType: "claude_local",
         adapterConfig: {},
       }));
@@ -634,7 +634,7 @@ describe.sequential("agent skill routes", () => {
     expect(mockAgentInstructionsService.materializeManagedBundle).toHaveBeenCalledWith(
       expect.objectContaining({
         id: "11111111-1111-4111-8111-111111111111",
-        role: "ceo",
+        role: "explorer",
         adapterType: "claude_local",
       }),
       expect.objectContaining({
@@ -652,7 +652,7 @@ describe.sequential("agent skill routes", () => {
       .post("/api/companies/company-1/agents")
       .send({
         name: "Engineer",
-        role: "engineer",
+        role: "general",
         adapterType: "claude_local",
         adapterConfig: {},
       }));
@@ -662,7 +662,7 @@ describe.sequential("agent skill routes", () => {
       expect(mockAgentInstructionsService.materializeManagedBundle).toHaveBeenCalledWith(
         expect.objectContaining({
           id: "11111111-1111-4111-8111-111111111111",
-          role: "engineer",
+          role: "general",
           adapterType: "claude_local",
         }),
         expect.objectContaining({
@@ -694,7 +694,7 @@ describe.sequential("agent skill routes", () => {
       .post("/api/companies/company-1/agent-hires")
       .send({
         name: "QA Agent",
-        role: "engineer",
+        role: "general",
         adapterType: "claude_local",
         desiredSkills: ["paperclip"],
         adapterConfig: {},
@@ -722,7 +722,7 @@ describe.sequential("agent skill routes", () => {
       .post("/api/companies/company-1/agent-hires")
       .send({
         name: "Security Engineer",
-        role: "engineer",
+        role: "general",
         icon: "crown",
         adapterType: "claude_local",
         desiredSkills: ["paperclip"],
@@ -766,7 +766,7 @@ describe.sequential("agent skill routes", () => {
       .post("/api/companies/company-1/agent-hires")
       .send({
         name: "QA Agent",
-        role: "engineer",
+        role: "general",
         adapterType: "claude_local",
         adapterConfig: {},
         instructionsBundle: {
@@ -800,7 +800,7 @@ describe.sequential("agent skill routes", () => {
       .post("/api/companies/company-1/agent-hires")
       .send({
         name: "QA Agent",
-        role: "engineer",
+        role: "general",
         adapterType: "claude_local",
         adapterConfig: {
           instructionsFilePath: "/tmp/existing/AGENTS.md",

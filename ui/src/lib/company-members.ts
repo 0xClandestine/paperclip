@@ -92,7 +92,7 @@ export function buildMarkdownMentionOptions(args: {
   const options: MentionOption[] = [
     ...buildCompanyUserMentionOptions(args.members),
     ...[...(args.agents ?? [])]
-      .filter((agent) => agent.status !== "terminated")
+      .filter((agent) => agent.status !== "paused")
       .sort((left, right) => left.name.localeCompare(right.name))
       .map((agent) => ({
         id: `agent:${agent.id}`,

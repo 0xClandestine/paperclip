@@ -179,8 +179,8 @@ describe("heartbeat comment wake batching", () => {
     await db.insert(agents).values({
       id: agentId,
       companyId,
-      name: "CEO",
-      role: "ceo",
+      name: "Lead Researcher",
+      role: "explorer",
       status: "running",
       adapterType: "process",
       adapterConfig: {},
@@ -210,7 +210,7 @@ describe("heartbeat comment wake batching", () => {
       priority: "medium",
       assigneeAgentId: agentId,
       executionRunId: runId,
-      executionAgentNameKey: "ceo",
+      executionAgentNameKey: "explorer",
       executionLockedAt: new Date(),
       issueNumber: 1,
       identifier: `${issuePrefix}-1`,
@@ -290,7 +290,7 @@ describe("heartbeat comment wake batching", () => {
         id: agentId,
         companyId,
         name: "Gateway Agent",
-        role: "engineer",
+        role: "general",
         status: "idle",
         adapterType: "openclaw_gateway",
         adapterConfig: {
@@ -483,7 +483,7 @@ describe("heartbeat comment wake batching", () => {
         id: agentId,
         companyId,
         name: "Gateway Agent",
-        role: "engineer",
+        role: "general",
         status: "idle",
         adapterType: "openclaw_gateway",
         adapterConfig: {
@@ -645,7 +645,7 @@ describe("heartbeat comment wake batching", () => {
         id: agentId,
         companyId,
         name: "Gateway Agent",
-        role: "engineer",
+        role: "general",
         status: "idle",
         adapterType: "openclaw_gateway",
         adapterConfig: {
@@ -833,7 +833,7 @@ describe("heartbeat comment wake batching", () => {
           id: assigneeAgentId,
           companyId,
           name: "Primary Agent",
-          role: "engineer",
+          role: "general",
           status: "idle",
           adapterType: "openclaw_gateway",
           adapterConfig: {
@@ -853,7 +853,7 @@ describe("heartbeat comment wake batching", () => {
           id: mentionedAgentId,
           companyId,
           name: "Mentioned Agent",
-          role: "engineer",
+          role: "general",
           status: "idle",
           adapterType: "openclaw_gateway",
           adapterConfig: {
@@ -1031,7 +1031,7 @@ describe("heartbeat comment wake batching", () => {
         id: agentId,
         companyId,
         name: "Gateway Agent",
-        role: "engineer",
+        role: "general",
         status: "idle",
         adapterType: "openclaw_gateway",
         adapterConfig: {
@@ -1185,7 +1185,7 @@ describe("heartbeat comment wake batching", () => {
           id: primaryAgentId,
           companyId,
           name: "Primary Agent",
-          role: "engineer",
+          role: "general",
           status: "idle",
           adapterType: "openclaw_gateway",
           adapterConfig: {
@@ -1205,7 +1205,7 @@ describe("heartbeat comment wake batching", () => {
           id: mentionedAgentId,
           companyId,
           name: "Mentioned Agent",
-          role: "engineer",
+          role: "general",
           status: "idle",
           adapterType: "openclaw_gateway",
           adapterConfig: {
@@ -1386,7 +1386,7 @@ describe("heartbeat comment wake batching", () => {
           id: primaryAgentId,
           companyId,
           name: "Primary Agent",
-          role: "engineer",
+          role: "general",
           status: "idle",
           adapterType: "openclaw_gateway",
           adapterConfig: {
@@ -1406,7 +1406,7 @@ describe("heartbeat comment wake batching", () => {
           id: mentionedAgentId,
           companyId,
           name: "Mentioned Agent",
-          role: "engineer",
+          role: "general",
           status: "idle",
           adapterType: "openclaw_gateway",
           adapterConfig: {
@@ -1532,7 +1532,7 @@ describe("heartbeat comment wake batching", () => {
         id: agentId,
         companyId,
         name: "Gateway Agent",
-        role: "engineer",
+        role: "general",
         status: "idle",
         adapterType: "openclaw_gateway",
         adapterConfig: {

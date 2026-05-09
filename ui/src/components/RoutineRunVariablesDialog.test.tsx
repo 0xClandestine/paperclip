@@ -102,7 +102,7 @@ function createAgent(): Agent {
     id: "agent-1",
     companyId: "company-1",
     name: "Routine Agent",
-    role: "engineer",
+    role: "general",
     title: null,
     status: "active",
     reportsTo: null,

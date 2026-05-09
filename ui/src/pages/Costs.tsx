@@ -523,13 +523,12 @@ export function Costs() {
   const budgetPolicies = budgetData?.policies ?? [];
   const activeBudgetIncidents = budgetData?.activeIncidents ?? [];
   const budgetPoliciesByScope = useMemo(() => ({
-    company: budgetPolicies.filter((policy) => policy.scopeType === "company"),
-    agent: budgetPolicies.filter((policy) => policy.scopeType === "agent"),
     project: budgetPolicies.filter((policy) => policy.scopeType === "project"),
+    agent: budgetPolicies.filter((policy) => policy.scopeType === "agent"),
   }), [budgetPolicies]);
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={DollarSign} message="Select a company to view costs." />;
+    return <EmptyState icon={DollarSign} message="Select a research project to view costs." />;
   }
 
   const showCustomPrompt = preset === "custom" && !customReady;
@@ -742,7 +741,7 @@ export function Costs() {
                                   <span className="h-3 w-3 shrink-0" />
                                 )}
                                 <Identity name={row.agentName ?? row.agentId} size="sm" />
-                                {row.agentStatus === "terminated" ? <StatusBadge status="terminated" /> : null}
+                                {row.agentStatus === "paused" ? <StatusBadge status="paused" /> : null}
                               </div>
                               <div className="text-right text-sm tabular-nums">
                                 <div className="font-medium">{formatCents(row.costCents)}</div>
@@ -901,7 +900,7 @@ export function Costs() {
               ) : null}
 
               <div className="space-y-5">
-                {(["company", "agent", "project"] as const).map((scopeType) => {
+                {(["project", "agent"] as const).map((scopeType) => {
                   const rows = budgetPoliciesByScope[scopeType];
                   if (rows.length === 0) return null;
                   return (
@@ -909,7 +908,7 @@ export function Costs() {
                       <div>
                         <h2 className="text-lg font-semibold capitalize">{scopeType} budgets</h2>
                         <p className="text-sm text-muted-foreground">
-                          {scopeType === "company"
+                          {scopeType === "project"
                             ? "Company-wide monthly policy."
                             : scopeType === "agent"
                               ? "Recurring monthly spend policies for individual agents."

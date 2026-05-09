@@ -389,9 +389,12 @@ function FrontmatterCard({
 
 // ── Client-side README generation ────────────────────────────────────
 
+// Autoresearch role labels — no C-suite.
 const ROLE_LABELS: Record<string, string> = {
-  ceo: "CEO", cto: "CTO", cmo: "CMO", cfo: "CFO", coo: "COO",
-  vp: "VP", manager: "Manager", engineer: "Engineer", agent: "Agent",
+  explorer: "Explorer",
+  optimizer: "Optimizer",
+  reviewer: "Reviewer",
+  general: "General",
 };
 
 /**
@@ -608,7 +611,7 @@ export function CompanyExport() {
   const initialFileFromUrl = useRef(filePathFromLocation(location.pathname));
   const currentUserId = session?.user?.id ?? session?.session?.userId ?? null;
   const visibleAgents = useMemo(
-    () => agents.filter((agent: Agent) => agent.status !== "terminated"),
+    () => agents.filter((agent: Agent) => agent.status !== "paused"),
     [agents],
   );
   const visibleProjects = useMemo(
@@ -911,7 +914,7 @@ export function CompanyExport() {
   }
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={Package} message="Select a company to export." />;
+    return <EmptyState icon={Package} message="Select a research project to export." />;
   }
 
   if (exportPreviewMutation.isPending && !exportData) {

@@ -300,7 +300,7 @@ export function costRoutes(
     await budgets.upsertPolicy(
       companyId,
       {
-        scopeType: "company",
+        scopeType: "project",
         scopeId: companyId,
         amount: req.body.budgetMonthlyCents,
         windowKind: "calendar_month_utc",

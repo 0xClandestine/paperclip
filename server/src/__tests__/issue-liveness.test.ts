@@ -28,7 +28,7 @@ function agent(overrides: Record<string, unknown> = {}) {
     id: coderId,
     companyId,
     name: "Coder",
-    role: "engineer",
+    role: "general",
     title: null,
     status: "idle",
     reportsTo: managerId,
@@ -38,8 +38,8 @@ function agent(overrides: Record<string, unknown> = {}) {
 
 const manager = agent({
   id: managerId,
-  name: "CTO",
-  role: "cto",
+  name: "Optimizer",
+  role: "optimizer",
   reportsTo: null,
 });
 
@@ -101,7 +101,7 @@ describe("issue graph liveness classifier", () => {
         agent({
           id: spoofedExecutiveId,
           name: "Chief Executive Recovery",
-          role: "cto",
+          role: "optimizer",
           title: "CEO",
           reportsTo: rootAgentId,
         }),

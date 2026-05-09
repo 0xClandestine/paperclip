@@ -510,7 +510,7 @@ function buildAcpxAgent({
     companyId: SKILLS_COMPANY_ID,
     name: `ACPX ${acpAgent === "custom" ? "Custom" : acpAgent === "codex" ? "Codex" : "Claude"}`,
     urlKey: `acpx-${acpAgent}`,
-    role: "engineer",
+    role: "general",
     title: `ACPX ${acpAgent} agent`,
     icon: "code",
     status: "idle",

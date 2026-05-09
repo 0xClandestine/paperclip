@@ -109,7 +109,7 @@ export const queryKeys = {
   access: {
     invites: (companyId: string, state: string = "all", limit: number = 20) =>
       ["access", "invites", "paginated-v1", companyId, state, limit] as const,
-    joinRequests: (companyId: string, status: string = "pending_approval") =>
+    joinRequests: (companyId: string, status: string = "idle") =>
       ["access", "join-requests", companyId, status] as const,
     companyMembers: (companyId: string) => ["access", "company-members", companyId] as const,
     companyUserDirectory: (companyId: string) => ["access", "company-user-directory", companyId] as const,

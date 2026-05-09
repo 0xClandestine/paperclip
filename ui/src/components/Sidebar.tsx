@@ -111,7 +111,7 @@ export function Sidebar() {
 
         <SidebarAgents />
 
-        <SidebarSection label="Company">
+        <SidebarSection label="Project">
           <SidebarNavItem to="/org" label="Org" icon={Network} />
           <SidebarNavItem to="/skills" label="Skills" icon={Boxes} />
           <SidebarNavItem to="/costs" label="Costs" icon={DollarSign} />

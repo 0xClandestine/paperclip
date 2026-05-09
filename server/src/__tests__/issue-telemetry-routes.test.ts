@@ -122,7 +122,7 @@ describe("issue telemetry routes", () => {
     mockAgentService.getById.mockResolvedValue({
       id: "agent-1",
       companyId: "company-1",
-      role: "engineer",
+      role: "general",
       adapterType: "codex_local",
       adapterConfig: { model: "claude-sonnet-4-6" },
     });

@@ -85,7 +85,7 @@ describeEmbeddedPostgres("GET /companies/:companyId/users/:userSlug/profile", ()
       id: agentId,
       companyId,
       name: "Coder",
-      role: "engineer",
+      role: "general",
       adapterType: "process",
       adapterConfig: {},
     });

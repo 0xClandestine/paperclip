@@ -145,7 +145,7 @@ describe("SystemNotice", () => {
               {
                 kind: "agent",
                 label: "Owner",
-                name: "CTO",
+                name: "Optimizer",
                 href: "/PAP/agents/cto",
               },
               {
@@ -167,7 +167,7 @@ describe("SystemNotice", () => {
     expect(links).toContain("/PAP/agents/codexcoder/runs/9cdba892");
     expect(node.textContent).toContain("PAP-3440");
     expect(node.textContent).toContain("Disposition recovery");
-    expect(node.textContent).toContain("CTO");
+    expect(node.textContent).toContain("Optimizer");
     expect(node.textContent).toContain("succeeded");
   });
 

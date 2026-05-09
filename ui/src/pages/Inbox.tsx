@@ -762,7 +762,7 @@ export function Inbox() {
     queryKey: queryKeys.access.joinRequests(selectedCompanyId!),
     queryFn: async () => {
       try {
-        return await accessApi.listJoinRequests(selectedCompanyId!, "pending_approval");
+        return await accessApi.listJoinRequests(selectedCompanyId!, "idle");
       } catch (err) {
         if (err instanceof ApiError && (err.status === 403 || err.status === 401)) {
           return [];
@@ -1853,7 +1853,7 @@ export function Inbox() {
   }, [selectedIndex]);
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={InboxIcon} message="Select a company to view inbox." />;
+    return <EmptyState icon={InboxIcon} message="Select a research project to view inbox." />;
   }
 
   const hasRunFailures = failedRuns.length > 0;

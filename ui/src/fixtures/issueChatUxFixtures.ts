@@ -21,7 +21,7 @@ function createAgent(
     companyId: "company-ux",
     name,
     urlKey,
-    role: "engineer",
+    role: "general",
     title: null,
     icon,
     status: "active",

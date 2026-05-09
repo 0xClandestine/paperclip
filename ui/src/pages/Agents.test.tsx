@@ -65,7 +65,7 @@ function makeAgent(overrides: Partial<Agent>): Agent {
     companyId: "company-1",
     name: "Alpha",
     urlKey: "alpha",
-    role: "engineer",
+    role: "general",
     title: null,
     icon: null,
     status: "active",
@@ -114,7 +114,7 @@ describe("Agents", () => {
       {
         id: "agent-1",
         name: "Alpha",
-        role: "engineer",
+        role: "general",
         status: "active",
         reports: [],
       },

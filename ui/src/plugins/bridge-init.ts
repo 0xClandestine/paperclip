@@ -303,7 +303,7 @@ function PluginSdkIssuesList({
   });
 
   if (!companyId) {
-    return createElement("div", { className: "text-sm text-muted-foreground" }, "Select a company to view issues.");
+    return createElement("div", { className: "text-sm text-muted-foreground" }, "Select a research project to view issues.");
   }
 
   return createElement(HostIssuesList, {
@@ -362,7 +362,7 @@ function PluginSdkAssigneePicker({
   );
   const sortedAgents = useMemo(
     () => sortAgentsByRecency(
-      (agents ?? []).filter((agent) => includeTerminatedAgents || agent.status !== "terminated"),
+      (agents ?? []).filter((agent) => includeTerminatedAgents || agent.status !== "paused"),
       recentAssigneeIds,
     ),
     [agents, includeTerminatedAgents, recentAssigneeIds],

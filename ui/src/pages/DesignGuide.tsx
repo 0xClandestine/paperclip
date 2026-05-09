@@ -399,8 +399,8 @@ export function DesignGuide() {
             {[
               "active", "running", "paused", "idle", "archived", "planned",
               "achieved", "completed", "failed", "timed_out", "succeeded", "error",
-              "pending_approval", "backlog", "todo", "in_progress", "in_review", "blocked",
-              "done", "terminated", "cancelled", "pending", "revision_requested",
+              "idle", "backlog", "todo", "in_progress", "in_review", "blocked",
+              "done", "paused", "cancelled", "pending", "revision_requested",
               "approved", "rejected",
             ].map((s) => (
               <StatusBadge key={s} status={s} />
@@ -959,7 +959,7 @@ export function DesignGuide() {
 
         <SubSection title="Initials derivation">
           <div className="flex flex-col gap-2">
-            <Identity name="CEO Agent" size="sm" />
+            <Identity name="Lead Researcher" size="sm" />
             <Identity name="Alpha" size="sm" />
             <Identity name="Quality Assurance Lead" size="sm" />
           </div>

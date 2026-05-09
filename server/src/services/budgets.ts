@@ -74,12 +74,12 @@ function budgetStatusFromObserved(
 }
 
 function normalizeScopeName(scopeType: BudgetScopeType, name: string) {
-  if (scopeType === "company") return name;
+  if (scopeType === "project") return name;
   return name.trim().length > 0 ? name : scopeType;
 }
 
 async function resolveScopeRecord(db: Db, scopeType: BudgetScopeType, scopeId: string): Promise<ScopeRecord> {
-  if (scopeType === "company") {
+  if (scopeType === "project") {
     const row = await db
       .select({
         companyId: companies.id,
@@ -566,7 +566,7 @@ export function budgetService(db: Db, hooks: BudgetServiceHooks = {}) {
           .returning()
           .then((rows) => rows[0]);
 
-      if (input.scopeType === "company" && windowKind === "calendar_month_utc") {
+      if (input.scopeType === "project" && windowKind === "calendar_month_utc") {
         await db
           .update(companies)
           .set({
@@ -652,12 +652,12 @@ export function budgetService(db: Db, hooks: BudgetServiceHooks = {}) {
           and(
             eq(budgetPolicies.companyId, event.companyId),
             eq(budgetPolicies.isActive, true),
-            inArray(budgetPolicies.scopeType, ["company", "agent", "project"]),
+            inArray(budgetPolicies.scopeType, ["project", "agent"]),
           ),
         );
 
       const relevantPolicies = candidatePolicies.filter((policy) => {
-        if (policy.scopeType === "company") return policy.scopeId === event.companyId;
+        if (policy.scopeType === "project") return policy.scopeId === event.companyId;
         if (policy.scopeType === "agent") return policy.scopeId === event.agentId;
         if (policy.scopeType === "project") return Boolean(event.projectId) && policy.scopeId === event.projectId;
         return false;
@@ -742,7 +742,7 @@ export function budgetService(db: Db, hooks: BudgetServiceHooks = {}) {
       if (!company) throw notFound("Company not found");
       if (company.status === "paused") {
         return {
-          scopeType: "company" as const,
+          scopeType: "project" as const,
           scopeId: companyId,
           scopeName: company.name,
           reason:
@@ -758,7 +758,7 @@ export function budgetService(db: Db, hooks: BudgetServiceHooks = {}) {
         .where(
           and(
             eq(budgetPolicies.companyId, companyId),
-            eq(budgetPolicies.scopeType, "company"),
+            eq(budgetPolicies.scopeType, "project"),
             eq(budgetPolicies.scopeId, companyId),
             eq(budgetPolicies.isActive, true),
             eq(budgetPolicies.metric, "billed_cents"),
@@ -769,7 +769,7 @@ export function budgetService(db: Db, hooks: BudgetServiceHooks = {}) {
         const observed = await computeObservedAmount(db, companyPolicy);
         if (observed >= companyPolicy.amount) {
           return {
-            scopeType: "company" as const,
+            scopeType: "project" as const,
             scopeId: companyId,
             scopeName: company.name,
             reason: "Company cannot start new work because its budget hard-stop is exceeded.",
@@ -894,7 +894,7 @@ export function budgetService(db: Db, hooks: BudgetServiceHooks = {}) {
           })
           .where(eq(budgetPolicies.id, policy.id));
 
-        if (policy.scopeType === "company" && policy.windowKind === "calendar_month_utc") {
+        if (policy.scopeType === "project" && policy.windowKind === "calendar_month_utc") {
           await db
             .update(companies)
             .set({ budgetMonthlyCents: nextAmount, updatedAt: now })
