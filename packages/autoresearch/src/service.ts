@@ -1,6 +1,6 @@
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, inArray, sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { evalConfigs, evalRuns } from "@paperclipai/db";
+import { evalConfigs, evalRuns, costEvents } from "@paperclipai/db";
 import { executeEval } from "./executor.js";
 import type {
   EvalConfig,
@@ -153,6 +153,23 @@ export function autoresearchService(db: any) {
       .where(eq(evalRuns.evalConfigId, config.id))
       .orderBy(asc(evalRuns.createdAt));
 
+    // Fetch per-run cost totals from cost_events, keyed by heartbeatRunId
+    const runIds = (runs as EvalRun[]).map((r) => r.heartbeatRunId).filter((id): id is string => id !== null);
+    const costByRunId = new Map<string, number>();
+    if (runIds.length > 0) {
+      const costRows: { heartbeatRunId: string; totalCents: number }[] = await db
+        .select({
+          heartbeatRunId: costEvents.heartbeatRunId,
+          totalCents: sql<number>`sum(${costEvents.costCents})`.mapWith(Number),
+        })
+        .from(costEvents)
+        .where(inArray(costEvents.heartbeatRunId, runIds))
+        .groupBy(costEvents.heartbeatRunId);
+      for (const row of costRows) {
+        if (row.heartbeatRunId) costByRunId.set(row.heartbeatRunId, row.totalCents);
+      }
+    }
+
     let runningBest: number | null = null;
     let cumulativeCost = 0;
     const points: ExperimentDataPoint[] = [];
@@ -167,12 +184,15 @@ export function autoresearchService(db: any) {
         runningBest = score;
       }
 
+      const costCents = run.heartbeatRunId ? (costByRunId.get(run.heartbeatRunId) ?? 0) : 0;
+      cumulativeCost += costCents;
+
       points.push({
         id: run.id,
         index: i + 1,
         score,
         disposition: (run.disposition as ExperimentDataPoint["disposition"]) ?? "crash",
-        costCents: 0,
+        costCents,
         commitHash: null,
         occurredAt: run.createdAt,
         isBest,
