@@ -236,10 +236,9 @@ export function ApprovalPayloadRenderer({
   payload: Record<string, unknown>;
   hidePrimaryTitle?: boolean;
 }) {
-  if (type === "request_board_approval") return <HireAgentPayload payload={payload} />;
-  if (type === "budget_override_required") return <BudgetOverridePayload payload={payload} />;
   if (type === "request_board_approval") {
     return <BoardApprovalPayload payload={payload} hideTitle={hidePrimaryTitle} />;
   }
+  if (type === "budget_override_required") return <BudgetOverridePayload payload={payload} />;
   return <CeoStrategyPayload payload={payload} />;
 }

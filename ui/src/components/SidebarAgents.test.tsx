@@ -212,7 +212,7 @@ describe("SidebarAgents", () => {
     expect(mockPushToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Agent paused" }));
   });
 
-  it("shows resume for paused sidebar agents", async () => {
+  it("hides paused agents from the sidebar", async () => {
     mockAgentsApi.list.mockResolvedValue([
       makeAgent({ status: "paused", pauseReason: "manual", pausedAt: new Date("2026-01-02T00:00:00Z") }),
     ]);
@@ -227,19 +227,9 @@ describe("SidebarAgents", () => {
       );
     });
     await flushReact();
-    await openAgentMenu();
 
-    const resumeItem = Array.from(document.body.querySelectorAll('[data-slot="dropdown-menu-item"]'))
-      .find((element) => element.textContent?.includes("Resume agent"));
-    expect(resumeItem).toBeTruthy();
-
-    await act(async () => {
-      resumeItem?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    });
-    await flushReact();
-
-    expect(mockAgentsApi.resume).toHaveBeenCalledWith("agent-1", "company-1");
-    expect(mockPushToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Agent resumed" }));
+    const trigger = document.body.querySelector('button[aria-label="Open actions for Alpha"]');
+    expect(trigger).toBeNull();
   });
 
   it("only shows updating state for the agent currently being changed", async () => {
@@ -279,7 +269,7 @@ describe("SidebarAgents", () => {
     expect(document.body.textContent).not.toContain("Updating...");
   });
 
-  it("does not offer sidebar resume for budget-paused agents", async () => {
+  it("hides budget-paused agents from the sidebar", async () => {
     mockAgentsApi.list.mockResolvedValue([
       makeAgent({
         status: "paused",
@@ -298,19 +288,8 @@ describe("SidebarAgents", () => {
       );
     });
     await flushReact();
-    await openAgentMenu();
 
-    const budgetPausedItem = Array.from(
-      document.body.querySelectorAll('[data-slot="dropdown-menu-item"]'),
-    )
-      .find((element) => element.textContent?.includes("Budget paused"));
-    expect(budgetPausedItem).toBeTruthy();
-
-    await act(async () => {
-      budgetPausedItem?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    });
-    await flushReact();
-
-    expect(mockAgentsApi.resume).not.toHaveBeenCalled();
+    const trigger = document.body.querySelector('button[aria-label="Open actions for Alpha"]');
+    expect(trigger).toBeNull();
   });
 });

@@ -1,3 +1,5 @@
+import { execFile as execFileCallback } from "node:child_process";
+import { promisify } from "node:util";
 import { Router, type Request } from "express";
 import type { Db } from "@paperclipai/db";
 import {
@@ -23,6 +25,19 @@ import {
   feedbackService,
   logActivity,
 } from "../services/index.js";
+import { autoresearchService } from "@paperclipai/autoresearch";
+
+const execFile = promisify(execFileCallback);
+
+async function fetchRemoteHead(repoUrl: string): Promise<string | null> {
+  try {
+    const { stdout } = await execFile("git", ["ls-remote", repoUrl, "HEAD"], { timeout: 10_000 });
+    const hash = stdout.trim().split(/\s+/)[0];
+    return hash && hash.length === 40 ? hash : null;
+  } catch {
+    return null;
+  }
+}
 import type { StorageService } from "../storage/types.js";
 import { assertBoard, assertCompanyAccess, assertInstanceAdmin, getActorInfo } from "./authz.js";
 
@@ -270,6 +285,23 @@ export function companyRoutes(db: Db, storage?: StorageService) {
       throw forbidden("Instance admin required");
     }
     const company = await svc.create(req.body);
+
+    // Create eval config + auto-lock baseline if eval fields provided
+    if (req.body.evalRepoUrl && req.body.evalPath && req.body.evalDirection) {
+      const evalSvc = autoresearchService(db as any);
+      await evalSvc.createConfig({
+        companyId: company.id,
+        repoUrl: req.body.evalRepoUrl,
+        evalPath: req.body.evalPath,
+        direction: req.body.evalDirection,
+        scoreUnit: req.body.evalScoreUnit,
+        timeoutMs: req.body.evalTimeoutMs,
+      });
+      const headRef = await fetchRemoteHead(req.body.evalRepoUrl);
+      if (headRef) {
+        await evalSvc.lockBaseline(company.id, headRef);
+      }
+    }
     await access.ensureMembership(company.id, "user", req.actor.userId ?? "local-board", "owner", "active");
     await logActivity(db, {
       companyId: company.id,

@@ -17,14 +17,16 @@ Run this checklist on every heartbeat.
 
 - `POST /api/issues/{id}/checkout` — claim the experiment
 - Don't retry 409 — it belongs to someone else
-- Run the experiment: make change → benchmark → record result
+- Make your code change, then **commit it**
+- **Do NOT run the eval yourself** — the system runs it automatically after your commit
+- The system will record score, raw output, and disposition (keep/discard/crash)
 
 ## 4. Report Result
 
-- Comment the result on the experiment with:
+- Comment on the experiment with:
   - Hypothesis tested
-  - Metric delta (absolute + percentage)
-  - Conclusion (keep/discard)
+  - What code change you made and why
+  - Your interpretation of the result (after eval completes)
 - Update experiment status: `done` if complete
 
 ## 5. Share Insights
