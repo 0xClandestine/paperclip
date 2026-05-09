@@ -721,6 +721,9 @@ importers:
       '@paperclipai/adapter-utils':
         specifier: workspace:*
         version: link:../packages/adapter-utils
+      '@paperclipai/autoresearch':
+        specifier: workspace:*
+        version: link:../packages/autoresearch
       '@paperclipai/shared':
         specifier: workspace:*
         version: link:../packages/shared
