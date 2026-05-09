@@ -136,12 +136,12 @@ pnpm test          →  NOT RUN (test fixtures not yet updated for new types)
 
 ### Critical
 
-1. **Eval execution is not wired into the experiment lifecycle.**
-   The `runEval()` service exists and works, but nothing calls it. The heartbeat
-   service needs to hook into the experiment workflow: after an agent commits,
-   clone the repo if needed, run `executeEval()`, and record the result.
-   - File to modify: `server/src/services/heartbeat.ts` (or new hook in experiment flow)
-   - The service call: `evalSvc.runEval({ evalConfigId, issueId, heartbeatRunId, cwd })`
+1. ~~**Eval execution is not wired into the experiment lifecycle.**~~
+   **Done.** `autoresearchService.runEval()` is now called in `heartbeat.ts`
+   after every successful run that has an `executionWorkspace.cwd`. It looks up
+   the eval config by `companyId`, runs the eval, logs the disposition to the
+   run log, and records the result in `eval_runs`. No-op for projects without
+   an eval config.
 
 2. **Repo cloning doesn't exist yet.**
    When an agent checks out an experiment, the system needs to clone/fetch the
