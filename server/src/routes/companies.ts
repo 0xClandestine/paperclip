@@ -23,6 +23,7 @@ import {
   feedbackService,
   logActivity,
 } from "../services/index.js";
+import { autoresearchService } from "@paperclipai/autoresearch";
 import type { StorageService } from "../storage/types.js";
 import { assertBoard, assertCompanyAccess, assertInstanceAdmin, getActorInfo } from "./authz.js";
 
@@ -270,6 +271,19 @@ export function companyRoutes(db: Db, storage?: StorageService) {
       throw forbidden("Instance admin required");
     }
     const company = await svc.create(req.body);
+
+    // Create eval config if eval fields provided
+    if (req.body.evalRepoUrl && req.body.evalPath && req.body.evalDirection) {
+      const evalSvc = autoresearchService(db as any);
+      await evalSvc.createConfig({
+        companyId: company.id,
+        repoUrl: req.body.evalRepoUrl,
+        evalPath: req.body.evalPath,
+        direction: req.body.evalDirection,
+        scoreUnit: req.body.evalScoreUnit,
+        timeoutMs: req.body.evalTimeoutMs,
+      });
+    }
     await access.ensureMembership(company.id, "user", req.actor.userId ?? "local-board", "owner", "active");
     await logActivity(db, {
       companyId: company.id,
