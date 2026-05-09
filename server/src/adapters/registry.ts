@@ -104,6 +104,14 @@ import {
   modelProfiles as piModelProfiles,
 } from "@paperclipai/adapter-pi-local";
 import {
+  execute as feynmanExecute,
+  testEnvironment as feynmanTestEnvironment,
+  sessionCodec as feynmanSessionCodec,
+} from "@paperclipai/adapter-feynman-local/server";
+import {
+  agentConfigurationDoc as feynmanAgentConfigurationDoc,
+} from "@paperclipai/adapter-feynman-local";
+import {
   execute as hermesExecute,
   testEnvironment as hermesTestEnvironment,
   sessionCodec as hermesSessionCodec,
@@ -353,6 +361,22 @@ const openCodeLocalAdapter: ServerAdapterModule = {
   agentConfigurationDoc: openCodeAgentConfigurationDoc,
 };
 
+const feynmanLocalAdapter: ServerAdapterModule = {
+  type: "feynman_local",
+  execute: feynmanExecute,
+  testEnvironment: feynmanTestEnvironment,
+  sessionCodec: feynmanSessionCodec,
+  sessionManagement: getAdapterSessionManagement("feynman_local") ?? undefined,
+  models: [],
+  modelProfiles: [],
+  supportsLocalAgentJwt: true,
+  supportsInstructionsBundle: true,
+  instructionsPathKey: "instructionsFilePath",
+  getRuntimeCommandSpec: (config) =>
+    buildNpmRuntimeCommandSpec(config, "feynman", "@companion-ai/feynman"),
+  agentConfigurationDoc: feynmanAgentConfigurationDoc,
+};
+
 const piLocalAdapter: ServerAdapterModule = {
   type: "pi_local",
   execute: piExecute,
@@ -456,6 +480,7 @@ function registerBuiltInAdapters() {
     claudeLocalAdapter,
     codexLocalAdapter,
     openCodeLocalAdapter,
+    feynmanLocalAdapter,
     piLocalAdapter,
     cursorLocalAdapter,
     geminiLocalAdapter,
