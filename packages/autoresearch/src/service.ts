@@ -1,7 +1,6 @@
 import { eq, asc } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { evalConfigs } from "./schema/eval-configs.js";
-import { evalRuns } from "./schema/eval-runs.js";
+import { evalConfigs, evalRuns } from "@paperclipai/db";
 import { executeEval } from "./executor.js";
 import type {
   EvalConfig,

@@ -1,5 +1,5 @@
-import type { evalConfigs } from "./schema/eval-configs.js";
-import type { evalRuns } from "./schema/eval-runs.js";
+import type { evalConfigs } from "@paperclipai/db";
+import type { evalRuns } from "@paperclipai/db";
 
 export type EvalDirection = "lower" | "higher";
 export const EVAL_DIRECTIONS: readonly EvalDirection[] = ["lower", "higher"] as const;
