@@ -21,7 +21,11 @@ dev: db-create
 	DATABASE_URL="$(DB_URL)" pnpm dev
 
 stop:
-	@lsof -ti:$(PORT) | xargs kill 2>/dev/null && echo "Stopped server on :$(PORT)" || echo "Nothing running on :$(PORT)"
+	@# Kill the server child (port listener) and the parent dev-runner, then clear lock files
+	@lsof -ti:$(PORT) | xargs kill 2>/dev/null; \
+	 pgrep -f "dev-runner.ts" | xargs kill 2>/dev/null; \
+	 rm -f ~/.paperclip/instances/default/runtime-services/*.json; \
+	 echo "Stopped"
 
 restart: stop dev
 
