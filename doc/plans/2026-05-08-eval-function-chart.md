@@ -1,289 +1,210 @@
 # Eval Function + Progress Chart — Feature Design
 
-Status: Draft
+Status: In Progress
 Date: 2026-05-08
 Branch: `feat/autoresearch-dashboard-charts`
 
 ## 1. Overview
 
-Every research project has a canonical **eval function** — an immutable piece of
-code that scores any code change. The system automatically runs the eval on
-every experiment and logs the result. The main dashboard shows a chart of
-**best score over time, overlaid with cumulative cost**.
+Every research project is centered on a **GitHub repo**. The repo contains the
+code being optimized and an **eval file** that scores any code change. The system
+clones the repo, runs agents against it, executes the eval on every experiment,
+and tracks progress on a dashboard chart.
 
-## 2. Eval Function
+## 2. Repo-Centric Model
 
-### 2.1 Definition
+### 2.1 Why a repo
+
+- The repo is the single source of truth for **both** the code and the eval.
+- Git history = audit trail. Every experiment links to a commit.
+- Cloning/forking the repo gives you the full project — no blob storage needed.
+- Immutability comes from pinning a git ref (commit hash), not from storing
+  file content in the DB.
+
+### 2.2 What's in the repo
+
+```
+json-parsers/
+├── src/           # code being optimized
+├── Cargo.toml
+├── eval.sh        # the canonical eval script
+└── README.md
+```
+
+The eval is a single executable file at a known path within the repo.
+It takes no input, runs against the current code, and prints a score on stdout.
+
+## 3. Eval Function
+
+### 3.1 Definition
 
 The eval is the oracle. It is:
 
-- **Immutable** — defined at project creation, never changes. If the eval needs to
-  change, create a new project.
-- **Configurable direction** — the project declares whether lower or higher scores
-  are better (e.g., `lower` for µs, `higher` for accuracy).
-- **Single source of truth** — every experiment in the project is measured by
-  exactly this function. Agents cannot substitute a different benchmark.
+- **Repo-based** — lives in the project's GitHub repo, not in the DB.
+- **Immutable via git** — the system pins a baseline commit hash. Once pinned,
+  the eval at that commit is authoritative for the project's lifetime.
+- **Configurable direction** — the project declares whether lower or higher
+  scores are better.
+- **Auto-executed** — the system clones the repo, runs the eval after every
+  agent commit, and parses the score automatically.
 
-### 2.2 How the eval is defined
+### 3.2 How the eval is defined
 
-At project creation, the creator picks one of two paths:
+At project creation, the creator provides:
 
-| Path | How it works |
-|------|-------------|
-| **Provide the file** | User uploads a script (bash, python, js, etc.) or pastes inline. The system stores it and marks it immutable. |
-| **Agent generates it** | User provides a natural-language prompt. An agent generates the eval script, the user reviews/approves it, and the system stores it immutably. |
+| Field | Description |
+|-------|-------------|
+| `repoUrl` | GitHub repo URL |
+| `evalPath` | Path to eval file within the repo (e.g. `eval.sh`, `bench/eval.py`) |
+| `direction` | `"lower"` or `"higher"` |
+| `scoreUnit` | Display label (e.g. `"µs"`, `"mbps"`) |
+| `timeoutMs` | Max eval wall-clock time (default 5 min) |
 
-### 2.3 Eval contract
+Two paths to get the eval file into the repo:
 
-The eval is a single executable file with a well-defined interface:
+| Path | How |
+|------|-----|
+| **User provides it** | The repo already has the eval file. The system verifies it exists at `evalPath` on clone. |
+| **Agent generates it** | User provides a prompt. An agent writes the eval file, commits it to the repo, and the system pins that commit as baseline. |
 
-```
-Input:  none (eval runs in the project workspace against current code)
-Output: a numeric score on stdout, optionally structured as a single JSON line
-
-Contract:
-  - Exit code 0 → success. Score is parsed from stdout.
-  - Exit code non-zero → eval failure. No score recorded.
-  - Stdout must contain exactly one number, or a JSON object with a "score" field.
-```
-
-Examples:
-
-```bash
-# Bash — parse throughput benchmark
-#!/bin/bash
-cargo bench --bench json_parse -- --output-format=json | jq '.throughput_mbps'
-```
-
-```python
-# Python — run test suite, score = wall clock seconds
-import subprocess, time
-start = time.time()
-subprocess.run(["pnpm", "test:run"], check=True)
-print(time.time() - start)
-```
-
-```bash
-# JSON output with metadata
-#!/bin/bash
-result=$(cargo bench --bench json_parse | tail -1)
-echo '{"score": '"$result"', "unit": "throughput_mbps"}'
-```
-
-### 2.4 Anti-cheating invariants
-
-The system enforces:
-
-1. **Immutability**: Once a project has its eval file, it cannot be changed. Any
-   attempt to modify it is rejected with an error. The eval hash is recorded at
-   project creation.
-2. **Automatic execution**: Every experiment run automatically executes the eval
-   as part of the experiment lifecycle. The agent does not need to invoke it
-   separately. The system captures stdout and parses the score.
-3. **Score provenance**: The raw eval stdout is stored alongside the parsed score.
-   Every score in the chart links back to the exact eval output that produced it.
-4. **No manual scoring**: The agent cannot report a score directly. The score
-   comes only from the eval output captured by the system. If an agent claims a
-   score in a comment, the system ignores it — the canonical score is from the
-   eval output.
-5. **Same eval, every time**: The system verifies the eval file hash matches the
-   project's recorded hash before every run. If it doesn't match, the experiment
-   is rejected.
-
-## 3. Experiment Lifecycle with Eval
-
-The experiment flow changes to automatically include eval:
+### 3.3 Eval contract
 
 ```
-Before (paperclip issue lifecycle):
-  agent checkout → agent runs code → agent reports result → agent comments
+Input:  none (eval runs in the cloned repo root)
+Output: a numeric score on stdout, or a JSON object with a "score" field
 
-After (autoresearch experiment lifecycle):
-  agent checkout → agent makes code change → system runs eval → system logs score → system records keep/discard
+  Exit code 0 → success. Score is parsed from stdout.
+  Exit code non-zero → eval crash. No score recorded.
 ```
 
-Steps:
+### 3.4 Anti-cheating invariants
 
-1. **Agent checks out** an experiment (same as current checkout).
-2. **Agent makes a code change** in the workspace (same as current).
-3. **System runs the eval** automatically:
-   - Resets workspace to the agent's commit.
-   - Executes `eval.sh` (or whatever the stored eval file is).
-   - Captures exit code, stdout, stderr, and wall clock duration.
-   - Parses the score from stdout.
-4. **System logs the result**:
-   - If eval passes (exit 0): record the score, timestamp, commit hash, cost.
-   - If eval fails (exit non-zero): record as `crash`, store stderr.
-5. **System determines keep/discard** by comparing the score against the
-   project's running best. If the score improves (per the project's direction),
-   the experiment is `kept`. Otherwise `discarded`.
-6. **Agent is notified** of the result. The agent can comment with analysis but
-   cannot override the keep/discard decision.
+1. **Immutable baseline**: Once `baselineRef` is locked, the eval config cannot
+   be changed. Any attempt to modify it is rejected.
+2. **System runs the eval**: The agent does not invoke the eval. The system
+   runs it automatically in the cloned repo workspace.
+3. **Score provenance**: Every score links back to the specific baseline ref
+   that produced it.
+4. **No manual scoring**: The agent cannot report a score. Only scores from
+   system-executed eval runs are canonical.
+5. **Same baseline, every time**: The system records which baseline ref was
+   used for each run.
 
-Agent's role narrows to: form hypothesis → write code → commit. The system
-handles measurement and disposition.
+## 4. Experiment Lifecycle
 
-## 4. Dashboard Chart
+```
+agent checkout → agent writes code → agent commits → system runs eval → system logs score → system determines keep/discard
+```
 
-### 4.1 Location
+1. Agent checks out an experiment.
+2. Agent writes code in the cloned repo workspace.
+3. Agent commits the change.
+4. System runs `eval.sh` (at the project's `evalPath`).
+5. System parses score, compares against running best.
+6. System determines `keep` or `discard`.
+7. System logs the eval run to `eval_runs`.
+8. Agent is notified of the result — can comment with analysis, but cannot
+   override the keep/discard decision.
 
-The chart lives on the main **Dashboard** page, above or replacing the existing
-summary cards. It is the primary visual for each selected project.
+## 5. Dashboard Chart
 
-### 4.2 Data shown
+### 5.1 Location
 
-A dual-axis time-series chart:
+Main dashboard page, above summary cards.
 
-| Axis | Data | Type |
-|------|------|------|
-| **Left Y** | Best score so far (monotonically improving) | Solid line |
-| **Right Y** | Cumulative compute cost ($) | Dashed line |
-| **X** | Time (experiment index or wall clock) | |
+### 5.2 Chart
 
-Each **point** on the score line = one experiment (both keeps and discards shown,
-but the "best" line only ever goes in the improving direction).
+Dual-axis time series:
 
-Color coding:
-- **Green dots** = keep (improved the best)
-- **Red dots** = discard (didn't beat the best)
-- **Gray dots** = crash (eval failed)
+| Axis | Series |
+|------|--------|
+| Left Y | Best score (monotonically improving) |
+| Right Y | Cumulative compute cost ($) |
+| X | Experiment index |
 
-Hovering a point shows: experiment #, score, delta from previous best, cost,
-commit hash, and a snippet of the agent's hypothesis.
+Color-coded dots:
+- 🟢 keep (improved best)
+- 🔴 discard (didn't beat best)
+- ⚫ crash (eval failed)
 
-### 4.3 Summary header above the chart
+Hover: experiment #, score, delta, cost, commit hash, hypothesis snippet.
+
+### 5.3 Summary header
 
 ```
 [Project Name]  │  Best: 142 µs  │  Experiments: 47 (12 kept)  │  Cost: $3.42
 ```
 
-## 5. Data Model Changes
+## 6. Data Model
 
-### 5.1 New columns on `companies`
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `eval_file_content` | text | The eval script source code |
-| `eval_file_name` | text | Filename (e.g., `eval.sh`) |
-| `eval_file_hash` | text | SHA-256 of content (immutability check) |
-| `eval_direction` | text | `"lower"` or `"higher"` |
-| `eval_score_unit` | text | Display unit (e.g., `"µs"`, `"mbps"`, `""`) |
-| `best_score` | float | Running best score across all experiments |
-| `best_score_run_id` | uuid | The experiment that achieved it |
-
-### 5.2 New columns on `issues` (experiments)
+### 6.1 `eval_configs` (one per project)
 
 | Column | Type | Description |
 |--------|------|-------------|
-| `eval_score` | float | The parsed score from eval output |
-| `eval_raw_output` | text | Full stdout from the eval run |
-| `eval_exit_code` | int | Exit code of the eval process |
-| `eval_duration_ms` | int | Wall clock duration of eval execution |
-| `eval_hash_at_run` | text | SHA-256 of eval file at time of run |
+| `id` | uuid | PK |
+| `company_id` | uuid | FK → companies, unique |
+| `repo_url` | text | GitHub repo URL |
+| `eval_path` | text | Path to eval file in repo |
+| `baseline_ref` | text | Pinned git commit hash (immutable once set) |
+| `direction` | text | "lower" or "higher" |
+| `score_unit` | text | Display label |
+| `timeout_ms` | int | Max eval wall-clock time |
+| `best_score` | float | Running best score |
+| `best_run_id` | uuid | FK → eval_runs |
+| `locked_at` | timestamptz | When baseline was pinned |
 
-### 5.3 New columns on `heartbeat_runs`
+### 6.2 `eval_runs` (one per experiment)
 
 | Column | Type | Description |
 |--------|------|-------------|
-| `eval_triggered` | boolean | Whether the eval was auto-triggered on this run |
+| `id` | uuid | PK |
+| `eval_config_id` | uuid | FK → eval_configs |
+| `issue_id` | uuid | FK → issues |
+| `heartbeat_run_id` | uuid | FK → heartbeat_runs |
+| `commit_hash` | text | Git commit at which eval was run |
+| `score` | float | Parsed score (null if crash) |
+| `raw_output` | text | Full stdout |
+| `raw_stderr` | text | Full stderr |
+| `exit_code` | int | 0 = success |
+| `duration_ms` | int | Wall-clock ms |
+| `baseline_ref` | text | Eval baseline ref at time of execution |
+| `disposition` | text | keep / discard / crash |
 
-## 6. API Changes
+## 7. Package Architecture
 
-### 6.1 Project creation
-
-`POST /api/companies`
-
-Add eval fields to request body:
-```json
-{
-  "name": "JSON parser optimization",
-  "evalDirection": "lower",
-  "evalScoreUnit": "µs",
-  "evalFileContent": "#!/bin/bash\ncargo bench ...",
-  "evalFileName": "eval.sh",
-  "evalPrompt": null
-}
+```
+packages/autoresearch/
+├── schema/
+│   ├── eval-configs.ts    # Drizzle table definition
+│   └── eval-runs.ts       # Drizzle table definition
+├── executor.ts            # spawn eval, capture output, enforce timeout
+├── parser.ts              # parse score from stdout
+├── service.ts             # CRUD, runEval(), getChartData()
+└── types.ts               # EvalDirection, EvalResult, EvalChartData, etc.
 ```
 
-Or with agent generation:
-```json
-{
-  "name": "JSON parser optimization",
-  "evalDirection": "lower",
-  "evalScoreUnit": "µs",
-  "evalPrompt": "Run cargo bench --bench json_parse and extract the throughput_mbps field"
-}
-```
+Zero dependencies on `@paperclipai/db`. The service takes a generic
+`PostgresJsDatabase`. `server/` passes its DB through.
 
-### 6.2 Dashboard
+### Integration points
 
-`GET /api/companies/:id/dashboard`
-
-Add eval chart data to response:
-```json
-{
-  "evalConfig": {
-    "direction": "lower",
-    "scoreUnit": "µs",
-    "bestScore": 142.5,
-    "bestScoreRunId": "..."
-  },
-  "experimentSeries": [
-    {
-      "id": "...",
-      "index": 1,
-      "score": 185.2,
-      "disposition": "keep",
-      "costCents": 12,
-      "commitHash": "abc1234",
-      "occurredAt": "2026-05-08T21:00:00Z"
-    }
-  ],
-  "costCumulativeCents": 342
-}
-```
-
-## 7. Agent-Side Impact
-
-### What changes for agents
-
-- Agents no longer run the benchmark themselves. They write code, commit, and
-  the system measures.
-- Agents no longer decide keep/discard. The system compares against the running
-  best.
-- Agents still write hypotheses, analysis, and observations as comments.
-- The `PAPERCLIP_TASK_ID` env var still indicates the current experiment.
-- New env var: `PAPERCLIP_EVAL_SCORE` — the score from the most recent eval
-  (available to the agent for analysis in its comments).
-
-### What pi-autoresearch already does that aligns
-
-- `init_experiment` sets metric name, unit, direction — maps to eval config
-- `run_experiment` runs a command and captures output — maps to eval execution
-- `log_experiment` records keep/discard — maps to system disposition
-
-The difference: in pi-autoresearch, the agent controls everything.
-In the control plane, the eval is system-enforced and automatic.
+| Package | Change |
+|---------|--------|
+| `packages/autoresearch` | Full eval logic (config, runs, execution, chart data) |
+| `packages/db` | Migration: add `companies.repo_url`, `companies.eval_path` columns |
+| `server` | Routes for eval CRUD + chart API. Hook into experiment lifecycle. |
+| `ui` | Chart component on dashboard. Eval config form at project creation. |
 
 ## 8. Open Questions
 
-1. **Eval timeout**: Should evals have a per-project timeout? (e.g., "eval must
-   complete within 5 minutes") What happens on timeout — treated as crash?
-2. **Eval sandboxing**: Should evals run in a sandboxed environment? For a V1,
-   assume they run in the same workspace as agent code changes.
-3. **Eval caching**: If two experiments produce the same code hash (unlikely),
-   should the system skip re-running the eval and use the cached score?
-4. **Multi-metric evals**: Should an eval be allowed to return multiple metrics
-   (e.g., throughput AND memory)? For V1, single score only.
-5. **Agent-generated eval approval**: When an agent generates the eval from a
-   prompt, does the user approve it in-UI before locking it in?
-
-## 9. Implementation Phases
-
-| Phase | Scope | Effort |
-|-------|-------|--------|
-| **1. Eval storage + immutability** | DB columns for eval file, hash, direction. API changes for project creation. Hash verification at experiment time. | S |
-| **2. Auto-eval execution** | Hook into experiment lifecycle — after agent commit, system runs eval, parses score, logs result. Keep/discard by system. | M |
-| **3. Dashboard chart** | React chart component on dashboard. Best-score line + cost line. Point hover details. | M |
-| **4. Agent UX** | Remove agent responsibility for running benchmark. Inject `PAPERCLIP_EVAL_SCORE` into agent env. Update agent instructions. | S |
-| **5. Agent-generated eval** | Agent receives prompt, writes eval file, user approves, system locks it. | S |
+1. **Repo cloning**: Who clones the repo — the server, or the agent's workspace
+   manager? Server-side cloning gives the system control over eval execution.
+2. **Agent workspace**: Does the agent work in the same cloned repo? Yes —
+   the workspace IS the cloned repo. Agents checkout experiments, write code in
+   the repo, commit, and the system runs eval from the same directory.
+3. **Multi-agent repos**: Can two agents work on the same repo simultaneously?
+   Yes — each gets a git worktree or branch.
+4. **Eval timeout**: What happens on timeout — treated as crash?
+5. **Multi-metric evals**: Single score for V1. Multi-metric later.
+6. **Agent-generated eval approval**: When an agent writes the eval from a
+   prompt, does the user approve before locking?

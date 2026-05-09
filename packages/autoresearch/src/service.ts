@@ -2,7 +2,6 @@ import { eq, asc } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { evalConfigs } from "./schema/eval-configs.js";
 import { evalRuns } from "./schema/eval-runs.js";
-import { hashEvalContent } from "./hasher.js";
 import { executeEval } from "./executor.js";
 import type {
   EvalConfig,
@@ -16,17 +15,18 @@ import type {
 
 export interface CreateEvalConfigInput {
   companyId: string;
-  fileContent: string;
-  fileName: string;
+  repoUrl: string;
+  evalPath: string;
   direction: EvalDirection;
   scoreUnit?: string | null;
+  timeoutMs?: number;
 }
 
 export interface RunEvalInput {
   evalConfigId: string;
   issueId: string;
   heartbeatRunId?: string | null;
-  /** The agent's working directory / workspace root. */
+  /** The working directory — cloned repo root for this experiment. */
   cwd: string;
 }
 
@@ -36,18 +36,15 @@ export function autoresearchService(db: PostgresJsDatabase) {
   // ── Config ──────────────────────────────────────────────
 
   async function createConfig(input: CreateEvalConfigInput): Promise<EvalConfig> {
-    const fileHash = hashEvalContent(input.fileContent);
-
     const [row] = await drizzle
       .insert(evalConfigs)
       .values({
         companyId: input.companyId,
-        fileContent: input.fileContent,
-        fileName: input.fileName,
-        fileHash,
+        repoUrl: input.repoUrl,
+        evalPath: input.evalPath,
         direction: input.direction,
         scoreUnit: input.scoreUnit ?? null,
-        lockedAt: new Date(),
+        timeoutMs: input.timeoutMs ?? 300_000,
       } satisfies NewEvalConfig)
       .returning();
 
@@ -59,6 +56,19 @@ export function autoresearchService(db: PostgresJsDatabase) {
       .select()
       .from(evalConfigs)
       .where(eq(evalConfigs.companyId, companyId));
+    return row ?? null;
+  }
+
+  async function lockBaseline(companyId: string, ref: string): Promise<EvalConfig | null> {
+    const [row] = await drizzle
+      .update(evalConfigs)
+      .set({
+        baselineRef: ref,
+        lockedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(evalConfigs.companyId, companyId))
+      .returning();
     return row ?? null;
   }
 
@@ -78,15 +88,14 @@ export function autoresearchService(db: PostgresJsDatabase) {
         rawStderr: "Eval config not found",
         exitCode: -1,
         durationMs: 0,
-        evalHashAtRun: "",
         disposition: "crash",
       };
     }
 
     const result = await executeEval({
-      fileContent: config.fileContent,
-      fileName: config.fileName,
       cwd: input.cwd,
+      evalPath: config.evalPath,
+      timeoutMs: config.timeoutMs,
       direction: config.direction as EvalDirection,
       bestScore: config.bestScore ?? null,
     });
@@ -101,7 +110,7 @@ export function autoresearchService(db: PostgresJsDatabase) {
       rawStderr: result.rawStderr,
       exitCode: result.exitCode,
       durationMs: result.durationMs,
-      evalHashAtRun: result.evalHashAtRun,
+      baselineRef: config.baselineRef,
       disposition: result.disposition,
     });
 
@@ -158,16 +167,13 @@ export function autoresearchService(db: PostgresJsDatabase) {
         runningBest = score;
       }
 
-      // Accumulate cost — placeholder until we wire up cost events
-      cumulativeCost += 0; // TODO: join with cost_events
-
       points.push({
         id: run.id,
         index: i + 1,
         score,
         disposition: (run.disposition as ExperimentDataPoint["disposition"]) ?? "crash",
-        costCents: 0, // TODO
-        commitHash: null, // TODO: join with heartbeat_runs
+        costCents: 0,
+        commitHash: null,
         occurredAt: run.createdAt,
         isBest,
         runningBestScore: runningBest,
@@ -188,6 +194,7 @@ export function autoresearchService(db: PostgresJsDatabase) {
   return {
     createConfig,
     getConfigByCompanyId,
+    lockBaseline,
     runEval,
     getRunById,
     listRuns,

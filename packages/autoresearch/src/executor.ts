@@ -1,20 +1,15 @@
 import { spawn } from "node:child_process";
-import { mkdtemp, writeFile, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { EvalDirection, EvalDisposition, EvalResult } from "./types.js";
-import { hashEvalContent } from "./hasher.js";
 import { parseScore } from "./parser.js";
 
 export interface ExecuteEvalOptions {
-  /** The eval script content. */
-  fileContent: string;
-  /** Display filename — used to determine the executor (extension). */
-  fileName: string;
-  /** Working directory — typically the project workspace root. */
+  /** Working directory — typically the cloned repo root. */
   cwd: string;
-  /** Max wall-clock time in milliseconds before the eval is killed. Default: 5 minutes. */
-  timeoutMs?: number;
+  /** Path to the eval file relative to cwd (e.g. "eval.sh", "bench/eval.py"). */
+  evalPath: string;
+  /** Max wall-clock time in milliseconds before the eval is killed. */
+  timeoutMs: number;
   /** The project's score direction — "lower" or "higher". */
   direction: EvalDirection;
   /** The current running best score (null if no experiments yet). */
@@ -22,54 +17,41 @@ export interface ExecuteEvalOptions {
 }
 
 /**
- * Execute the eval script in a temp directory, capture output,
- * parse the score, and determine disposition.
+ * Execute the eval script in the repo working directory,
+ * capture output, parse the score, and determine disposition.
  */
 export async function executeEval(opts: ExecuteEvalOptions): Promise<EvalResult> {
-  const timeoutMs = opts.timeoutMs ?? 5 * 60 * 1000;
-  const evalHash = hashEvalContent(opts.fileContent);
+  const evalFullPath = join(opts.cwd, opts.evalPath);
 
-  // Write eval to a temp file so we can execute it
-  const tmpDir = await mkdtemp(join(tmpdir(), "autoresearch-eval-"));
-  const evalPath = join(tmpDir, opts.fileName);
+  const start = performance.now();
+  const { exitCode, stdout, stderr } = await spawnAndCapture(evalFullPath, opts.cwd, opts.timeoutMs);
+  const durationMs = Math.round(performance.now() - start);
 
-  try {
-    await writeFile(evalPath, opts.fileContent, { mode: 0o755 });
+  const rawOutput = stdout.trim();
+  const rawStderr = stderr.trim();
 
-    const start = performance.now();
-    const { exitCode, stdout, stderr } = await spawnAndCapture(evalPath, opts.cwd, timeoutMs);
-    const durationMs = Math.round(performance.now() - start);
-
-    const rawOutput = stdout.trim();
-    const rawStderr = stderr.trim();
-
-    if (exitCode !== 0) {
-      return {
-        score: null,
-        rawOutput,
-        rawStderr,
-        exitCode,
-        durationMs,
-        evalHashAtRun: evalHash,
-        disposition: "crash",
-      };
-    }
-
-    const score = parseScore(rawOutput);
-    const disposition = determineDisposition(score, opts.direction, opts.bestScore);
-
+  if (exitCode !== 0) {
     return {
-      score,
+      score: null,
       rawOutput,
       rawStderr,
       exitCode,
       durationMs,
-      evalHashAtRun: evalHash,
-      disposition,
+      disposition: "crash",
     };
-  } finally {
-    await rm(tmpDir, { recursive: true, force: true });
   }
+
+  const score = parseScore(rawOutput);
+  const disposition = determineDisposition(score, opts.direction, opts.bestScore);
+
+  return {
+    score,
+    rawOutput,
+    rawStderr,
+    exitCode,
+    durationMs,
+    disposition,
+  };
 }
 
 function spawnAndCapture(
@@ -102,7 +84,7 @@ function spawnAndCapture(
     child.on("close", (code) => {
       resolve({
         exitCode: code ?? -1,
-        stdout: stdout.slice(0, 64 * 1024), // cap at 64KB
+        stdout: stdout.slice(0, 64 * 1024),
         stderr: stderr.slice(0, 64 * 1024),
       });
     });
@@ -115,7 +97,7 @@ function determineDisposition(
   bestScore: number | null,
 ): EvalDisposition {
   if (score === null) return "crash";
-  if (bestScore === null) return "keep"; // first experiment always keeps
+  if (bestScore === null) return "keep";
 
   const improved =
     direction === "lower" ? score < bestScore : score > bestScore;

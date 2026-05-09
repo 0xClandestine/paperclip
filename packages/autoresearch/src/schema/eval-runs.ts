@@ -15,6 +15,8 @@ export const evalRuns = pgTable(
     issueId: uuid("issue_id").notNull(),
     /** FK to heartbeat_runs.id — the agent run that produced the code change. */
     heartbeatRunId: uuid("heartbeat_run_id"),
+    /** The git commit hash at which the eval was executed. */
+    commitHash: text("commit_hash"),
     /** The parsed numeric score. null if eval crashed. */
     score: doublePrecision("score"),
     /** Full stdout from the eval process. */
@@ -25,9 +27,9 @@ export const evalRuns = pgTable(
     exitCode: integer("exit_code"),
     /** Wall-clock duration of eval execution in milliseconds. */
     durationMs: integer("duration_ms"),
-    /** SHA-256 of the eval file at time of execution (provenance). */
-    evalHashAtRun: text("eval_hash_at_run"),
-    /** Disposition determined by the system. */
+    /** The eval baseline ref at time of execution (provenance). */
+    baselineRef: text("baseline_ref"),
+    /** Disposition determined by the system: keep / discard / crash. */
     disposition: text("disposition").notNull().default("keep"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },

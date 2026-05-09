@@ -15,21 +15,13 @@ export type NewEvalConfig = typeof evalConfigs.$inferInsert;
 export type EvalRun = typeof evalRuns.$inferSelect;
 export type NewEvalRun = typeof evalRuns.$inferInsert;
 
-/** The parsed result of running an eval. */
+/** The parsed result of executing the eval. */
 export interface EvalResult {
-  /** The numeric score, or null if parsing failed or the eval crashed. */
   score: number | null;
-  /** Full stdout from the eval process. */
   rawOutput: string;
-  /** Full stderr from the eval process. */
   rawStderr: string;
-  /** Exit code — 0 = success, non-zero = crash. */
   exitCode: number;
-  /** Wall-clock duration in milliseconds. */
   durationMs: number;
-  /** SHA-256 of eval file content at time of execution. */
-  evalHashAtRun: string;
-  /** System-determined disposition. */
   disposition: EvalDisposition;
 }
 
@@ -38,7 +30,7 @@ export interface ExperimentDataPoint {
   id: string;
   /** Sequential experiment number within the project. */
   index: number;
-  /** The score from this experiment. null if crash. */
+  /** The measured score. null if crash. */
   score: number | null;
   /** keep / discard / crash. */
   disposition: EvalDisposition;
