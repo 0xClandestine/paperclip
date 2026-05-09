@@ -17,7 +17,7 @@ help:
 	@echo "  db-reset   Drop, recreate, and restart dev server"
 	@echo "  install    pnpm install"
 
-dev: db-create
+dev: install db-create
 	DATABASE_URL="$(DB_URL)" pnpm dev
 
 stop:
