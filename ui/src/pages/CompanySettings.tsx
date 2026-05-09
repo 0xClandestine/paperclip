@@ -1,5 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { evalApi, type EvalConfigSummary } from "../api/eval";
 import {
   DEFAULT_COMPANY_ATTACHMENT_MAX_BYTES,
   MAX_COMPANY_ATTACHMENT_MAX_BYTES,
@@ -190,6 +191,20 @@ export function CompanySettings() {
     setSnippetCopied(false);
     setSnippetCopyDelightId(0);
   }, [selectedCompanyId]);
+
+  const [lockRef, setLockRef] = useState("");
+  const { data: evalConfig, refetch: refetchEvalConfig } = useQuery({
+    queryKey: ["eval-config", selectedCompanyId],
+    queryFn: () => evalApi.getConfig(selectedCompanyId!).catch(() => null),
+    enabled: !!selectedCompanyId,
+  });
+  const lockBaselineMutation = useMutation({
+    mutationFn: (ref: string) => evalApi.lockBaseline(selectedCompanyId!, ref),
+    onSuccess: () => {
+      setLockRef("");
+      void refetchEvalConfig();
+    },
+  });
 
   const archiveMutation = useMutation({
     mutationFn: ({
@@ -534,6 +549,72 @@ export function CompanySettings() {
               </a>
             </Button>
           </div>
+        </div>
+      </div>
+
+      {/* Eval Benchmark */}
+      <div className="space-y-4">
+        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          Eval Benchmark
+        </div>
+        <div className="space-y-3 rounded-md border border-border px-4 py-4 text-sm">
+          {evalConfig ? (
+            <>
+              {(() => {
+                const cfg = evalConfig as EvalConfigSummary;
+                return (
+                  <div className="grid grid-cols-[7rem_1fr] gap-y-2 text-sm">
+                    <span className="text-muted-foreground">Repo</span>
+                    <span className="font-mono text-xs break-all">{cfg.repoUrl}</span>
+                    <span className="text-muted-foreground">Eval path</span>
+                    <span className="font-mono text-xs">{cfg.evalPath}</span>
+                    <span className="text-muted-foreground">Direction</span>
+                    <span>{cfg.direction}</span>
+                    {cfg.scoreUnit && (
+                      <>
+                        <span className="text-muted-foreground">Score unit</span>
+                        <span>{cfg.scoreUnit}</span>
+                      </>
+                    )}
+                    <span className="text-muted-foreground">Baseline ref</span>
+                    <span className="font-mono text-xs">
+                      {cfg.baselineRef ?? (
+                        <span className="text-yellow-600 dark:text-yellow-400">not locked</span>
+                      )}
+                    </span>
+                  </div>
+                );
+              })()}
+              {!(evalConfig as EvalConfigSummary).lockedAt && (
+                <div className="mt-3 flex items-center gap-2">
+                  <input
+                    className="flex-1 rounded-md border border-border bg-transparent px-2.5 py-1.5 text-xs font-mono outline-none"
+                    placeholder="Git commit hash or ref to lock baseline"
+                    value={lockRef}
+                    onChange={(e) => setLockRef(e.target.value)}
+                  />
+                  <Button
+                    size="sm"
+                    disabled={!lockRef.trim() || lockBaselineMutation.isPending}
+                    onClick={() => lockBaselineMutation.mutate(lockRef.trim())}
+                  >
+                    {lockBaselineMutation.isPending ? "Locking..." : "Lock baseline"}
+                  </Button>
+                </div>
+              )}
+              {lockBaselineMutation.isError && (
+                <p className="text-xs text-destructive">
+                  {lockBaselineMutation.error instanceof Error
+                    ? lockBaselineMutation.error.message
+                    : "Failed to lock baseline"}
+                </p>
+              )}
+            </>
+          ) : (
+            <p className="text-muted-foreground">
+              No eval benchmark configured for this project. Add one when creating a new project or via the API.
+            </p>
+          )}
         </div>
       </div>
 
