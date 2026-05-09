@@ -434,7 +434,7 @@ describe("InviteLandingPage", () => {
       humanRole: "operator",
       expiresAt: "2027-03-07T00:10:00.000Z",
       inviteMessage: "Welcome aboard.",
-      joinRequestStatus: "idle",
+      joinRequestStatus: "pending_approval",
       joinRequestType: "human",
     });
     getSessionMock.mockResolvedValue({
