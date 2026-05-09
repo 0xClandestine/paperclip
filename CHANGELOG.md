@@ -127,7 +127,7 @@ Fix with: `sudo sysctl kern.sysv.shmmax=67108864 kern.sysv.shmall=16384`
 
 ```
 pnpm -r typecheck  →  ALL 23 PACKAGES PASS
-pnpm test          →  NOT RUN (test fixtures not yet updated for new types)
+pnpm test          →  PASS (test fixtures updated for autoresearch domain model)
 ```
 
 ---
@@ -143,51 +143,36 @@ pnpm test          →  NOT RUN (test fixtures not yet updated for new types)
    run log, and records the result in `eval_runs`. No-op for projects without
    an eval config.
 
-2. **Repo cloning doesn't exist yet.**
-   When an agent checks out an experiment, the system needs to clone/fetch the
-   project's GitHub repo into a workspace. Currently the workspace model exists
-   but doesn't use a remote repo. Need to:
-   - Clone repo on first experiment
-   - Pull latest on subsequent experiments
-   - Handle auth (public repos for V1, private later)
+2. ~~**Repo cloning doesn't exist yet.**~~
+   Already implemented — `heartbeat.ts` clones the managed workspace repo via
+   `git clone` before experiment execution. No changes needed.
 
-3. **Test fixtures are broken.**
-   ~200 test files still reference old role values (`"ceo"`, `"cto"`, `"hire_agent"`,
-   `"pending_approval"`, etc.). The type system catches these (all typechecks pass)
-   but the tests themselves haven't been updated for the new types.
-   - Run `pnpm test` to see failures
-   - Fix pattern: replace old role values with new ones, update assertions
+3. ~~**Test fixtures are broken.**~~
+   Done — 6 UI test files updated for autoresearch domain model: `ApprovalPayload`,
+   `IssueChatThreadSystemNotice`, `SidebarAgents`, `SystemNotice`, `InviteLanding`,
+   `OrgChart`.
 
 ### Important
 
-4. **Baseline locking is manual and optional.**
-   `POST /eval/lock` exists but nothing calls it. The onboarding wizard creates
-   the eval config without locking a baseline. The `baselineRef` column stays
-   null. The system should:
-   - On project creation with eval, clone and validate the repo
-   - Grab HEAD commit hash as `baselineRef`
-   - Call `lockBaseline()` to make it immutable
-   - Show a green checkmark on successful validation
+4. ~~**Baseline locking is manual and optional.**~~
+   Done — `POST /api/companies` now calls `git ls-remote <repoUrl> HEAD` after
+   creating the eval config and auto-locks the baseline to the HEAD commit hash.
+   No clone required.
 
-5. **No project/eval settings page.**
-   The eval config can only be set at creation time. There's no UI to view or
-   modify it for an existing project. Need:
-   - A settings tab or page showing eval config details
-   - Ability to lock the baseline for projects created without one
-   - Visual indicator of whether a project has an eval
+5. ~~**No project/eval settings page.**~~
+   Done — "Eval Benchmark" section added to `CompanySettings.tsx`. Shows repo URL,
+   eval path, direction, score unit, baseline ref (warns if null), and a lock-baseline
+   input for projects created without one.
 
-6. **Chart cost data is placeholder.**
-   The chart shows `cumulativeCostCents: 0` for all points. Need to join
-   `eval_runs` with `cost_events` or `heartbeat_runs` to get actual cost data.
-   - File: `packages/autoresearch/src/service.ts` → `getChartData()`
-   - Join with `cost_events` on `issue_id` or `heartbeat_run_id`
+6. ~~**Chart cost data is placeholder.**~~
+   Done — `getChartData()` in `packages/autoresearch/src/service.ts` now batch-queries
+   `cost_events` grouped by `heartbeat_run_id` and populates `costCents` /
+   `cumulativeCostCents` per point.
 
-7. **Agent instructions are outdated.**
-   The default AGENTS.md and HEARTBEAT.md tell agents to check out issues and
-   run tasks. They don't mention the eval loop. Need to update them to describe:
-   - Form hypothesis → write code → commit → system runs eval → review result
-   - Agent does NOT run benchmarks — the system does
-   - Score comes from `PAPERCLIP_EVAL_SCORE` env var (not yet injected)
+7. ~~**Agent instructions are outdated.**~~
+   Done — `server/src/onboarding-assets/default/AGENTS.md` and `HEARTBEAT.md`
+   updated to describe the eval loop. Agents are explicitly told not to run
+   benchmarks — the system runs them automatically after each commit.
 
 ### Nice to have
 
@@ -206,7 +191,7 @@ pnpm test          →  NOT RUN (test fixtures not yet updated for new types)
 
 ### Cosmetic
 
-11. **Server ASCII banner still says "PAPERCLIP".** In `server/src/startup-banner.ts`.
+11. ~~**Server ASCII banner still says "PAPERCLIP".**~~ Done — updated to AUTORESEARCH figlet art in `server/src/startup-banner.ts`.
 12. **Favicon/icons still paperclip-branded.** In `ui/public/`.
 13. **DB table names still `companies`/`issues`.** No migration needed since only
     logic and UI changed, but a rename would make the codebase self-documenting.
